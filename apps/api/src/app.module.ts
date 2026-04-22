@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import configuration, { configValidationSchema } from './config/configuration';
 import { PrismaModule } from './database/prisma/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 
 @Module({
@@ -16,9 +17,8 @@ import { HealthModule } from './modules/health/health.module';
     }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     PrismaModule,
+    AuthModule,
     HealthModule,
-    // Phase 1.4 — DatabaseModule (Prisma)
-    // Phase 1.5 — AuthModule
     // Phase 1.6 — UsersModule
     // Phase 1.7 — TicketsModule
     // Phase 2.2 — TasksModule

@@ -78,16 +78,22 @@
 - [x] Seed script — 3 users, 5 tickets (all categories/statuses), 9 tasks, 7 audit logs
 - [ ] Run migration: `pnpm docker:up` then `pnpm db:migrate` (requires DATABASE_URL in .env.local)
 
-### 1.5 Auth — Auth0 Integration
-- [ ] Create Auth0 tenant + application
-- [ ] Configure Auth0 environment variables
-- [ ] Backend: Auth module with JWT strategy (passport-jwt)
-- [ ] Backend: Auth0 token validation
-- [ ] Backend: RBAC guard (roles: ADMIN, MANAGER, MEMBER)
-- [ ] Frontend: Auth0 SDK setup (@auth0/nextjs-auth0)
-- [ ] Frontend: Login / logout flow
-- [ ] Frontend: Protected route middleware
-- [ ] Frontend: Auth context / user hook
+### 1.5 Auth — Auth0 Integration ✅
+- [ ] Create Auth0 tenant + application (manual — see docs/auth0-setup.md)
+- [ ] Fill in AUTH0_* values in .env.local (manual)
+- [x] Backend: AuthModule (auth.module.ts) with PassportModule
+- [x] Backend: JwtStrategy — RS256 validation via jwks-rsa + Auth0 JWKS endpoint
+- [x] Backend: AuthService.validateAndSyncUser() — auto-upserts user on every login
+- [x] Backend: GET /api/auth/profile — returns DB user profile
+- [x] Backend: RBAC — JwtAuthGuard + RolesGuard already wired (Phase 1.3), role from DB
+- [x] Frontend: @auth0/nextjs-auth0 SDK installed (Phase 1.2)
+- [x] Frontend: Login/logout — /api/auth/login, /api/auth/logout, Sidebar sign-out link
+- [x] Frontend: middleware.ts — withMiddlewareAuthRequired() blocks /dashboard, /tickets, /settings
+- [x] Frontend: GET /api/auth/token route — serves access token to client components
+- [x] Frontend: services/api.ts — request interceptor injects Bearer token automatically
+- [x] Frontend: features/auth/hooks/useAuth.ts — useUser() wrapper with typed helpers
+- [x] Frontend: features/auth/hooks/useAccessToken.ts — React Query hook for access token
+- [x] Docs: docs/auth0-setup.md — step-by-step Auth0 tenant + API setup guide
 
 ### 1.6 Users Module (Backend)
 - [ ] `GET /users` — list users (ADMIN only)
