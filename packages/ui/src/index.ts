@@ -1,2 +1,5 @@
-// Shared UI components — populated in Phase 1.2 (Frontend setup)
-export {};
+export { Button } from './Button';
+export { Card, CardHeader, CardBody } from './Card';
+export { Badge } from './Badge';
+export { Input } from './Input';
+export { Modal } from './Modal';

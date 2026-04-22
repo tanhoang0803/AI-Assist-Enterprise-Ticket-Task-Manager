@@ -32,15 +32,20 @@
 - [x] Add .prettierrc.json + .prettierignore
 - [x] pnpm install — all 5 workspace packages linked
 
-### 1.2 Frontend — Next.js App Setup
-- [ ] Initialize Next.js 14 app with TypeScript in `apps/web/`
-- [ ] Configure TailwindCSS
-- [ ] Set up App Router layout (root layout, metadata)
-- [ ] Create placeholder pages: `/`, `/dashboard`, `/tickets`, `/auth`
-- [ ] Install and configure Zustand (global state)
-- [ ] Install and configure React Query (server state)
-- [ ] Create base UI components in `packages/ui/` (Button, Card, Badge, Modal, Input)
-- [ ] Set up path aliases (`@/`, `@ui/`, `@types/`)
+### 1.2 Frontend — Next.js App Setup ✅
+- [x] Initialize Next.js 14.2.25 app with TypeScript in `apps/web/`
+- [x] Configure TailwindCSS + PostCSS
+- [x] Set up App Router layout (root layout with Inter font + metadata)
+- [x] Route group `(protected)/` with server-side auth guard
+- [x] Pages: `/` (redirect), `/auth/login`, `/dashboard`, `/tickets`, `/tickets/[id]`
+- [x] Auth0 route handler: `app/api/auth/[...auth0]/route.ts`
+- [x] Install and configure Zustand (`store/uiStore.ts`)
+- [x] Install and configure React Query (`components/providers/QueryProviders.tsx`)
+- [x] Shared UI components in `packages/ui/`: Button, Card, Badge, Input, Modal
+- [x] Layout shell: Sidebar + Header components
+- [x] API client: `services/api.ts` (axios with 401→login redirect)
+- [x] `hooks/useDebounce.ts` shared hook
+- [x] Path aliases: `@/*`, `@ui/*`, `@types-repo/*`, `@utils/*`
 
 ### 1.3 Backend — NestJS App Setup
 - [ ] Initialize NestJS app in `apps/api/`
