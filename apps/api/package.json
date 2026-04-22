@@ -57,7 +57,7 @@
     "typescript": "^5.4.5"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "ts-node --project prisma/tsconfig.seed.json prisma/seed.ts"
   },
   "jest": {
     "moduleFileExtensions": ["js", "json", "ts"],
