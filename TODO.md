@@ -23,11 +23,14 @@
 
 ## Phase 1 — MVP Core (🔴 FOUNDATION)
 
-### 1.1 Monorepo Setup
-- [ ] Configure pnpm workspaces
-- [ ] Configure Turborepo pipelines
-- [ ] Set up shared tsconfig (packages/config)
-- [ ] Set up shared eslint config (packages/config)
+### 1.1 Monorepo Setup ✅
+- [x] Configure pnpm workspaces (pnpm-workspace.yaml)
+- [x] Configure Turborepo pipelines (turbo.json)
+- [x] Set up shared tsconfig (packages/config: base / nextjs / nestjs)
+- [x] Set up shared eslint config (packages/config: base / next / nest)
+- [x] Create shared packages: types (User, Ticket, Task, enums), utils (cn, date, format), ui (stub)
+- [x] Add .prettierrc.json + .prettierignore
+- [x] pnpm install — all 5 workspace packages linked
 
 ### 1.2 Frontend — Next.js App Setup
 - [ ] Initialize Next.js 14 app with TypeScript in `apps/web/`
