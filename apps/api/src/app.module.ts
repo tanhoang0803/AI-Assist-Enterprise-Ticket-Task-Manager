@@ -1,0 +1,29 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
+import configuration, { configValidationSchema } from './config/configuration';
+import { HealthModule } from './modules/health/health.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      validationSchema: configValidationSchema,
+      validationOptions: { abortEarly: false },
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
+    }),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    HealthModule,
+    // Phase 1.4 — DatabaseModule (Prisma)
+    // Phase 1.5 — AuthModule
+    // Phase 1.6 — UsersModule
+    // Phase 1.7 — TicketsModule
+    // Phase 2.2 — TasksModule
+    // Phase 2.4 — NotificationsModule
+    // Phase 2.6 — LogsModule
+    // Phase 3.1 — QueueModule
+    // Phase 3.2 — AiModule
+  ],
+})
+export class AppModule {}

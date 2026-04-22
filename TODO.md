@@ -47,15 +47,19 @@
 - [x] `hooks/useDebounce.ts` shared hook
 - [x] Path aliases: `@/*`, `@ui/*`, `@types-repo/*`, `@utils/*`
 
-### 1.3 Backend — NestJS App Setup
-- [ ] Initialize NestJS app in `apps/api/`
-- [ ] Configure TypeScript strict mode
-- [ ] Set up global validation pipe (class-validator + class-transformer)
-- [ ] Set up global exception filter
-- [ ] Set up CORS
-- [ ] Configure environment/config module (@nestjs/config)
-- [ ] Set up Swagger/OpenAPI docs
-- [ ] Add health check endpoint
+### 1.3 Backend — NestJS App Setup ✅
+- [x] Initialize NestJS app in `apps/api/` (package.json, nest-cli.json, tsconfig)
+- [x] Configure TypeScript strict mode (extends @repo/config/tsconfig/nestjs)
+- [x] Global ValidationPipe (whitelist, forbidNonWhitelisted, transform)
+- [x] Global exception filter (GlobalExceptionFilter — logs 5xx, returns structured errors)
+- [x] CORS + Helmet configured in main.ts
+- [x] @nestjs/config with Joi schema validation (configValidationSchema)
+- [x] Swagger/OpenAPI at /api/docs (dev only) with Bearer auth
+- [x] Health check: GET /health (terminus — memory heap indicator)
+- [x] Common layer: JwtAuthGuard, RolesGuard, @CurrentUser(), @Roles() decorator
+- [x] LoggingInterceptor + TransformInterceptor (wraps all responses)
+- [x] Graceful shutdown hooks
+- [x] tsc --noEmit passes with zero errors
 
 ### 1.4 Database — Prisma + PostgreSQL
 - [ ] Install and init Prisma in `apps/api/`
