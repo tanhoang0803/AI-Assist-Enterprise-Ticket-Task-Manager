@@ -1,0 +1,97 @@
+# ========================
+# Environment & Secrets
+# ========================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+infrastructure/env/.env
+
+# ========================
+# Node
+# ========================
+node_modules/
+.pnp
+.pnp.js
+
+# ========================
+# Build outputs
+# ========================
+dist/
+build/
+.next/
+out/
+
+# ========================
+# TypeScript
+# ========================
+*.tsbuildinfo
+.turbo/
+
+# ========================
+# Testing
+# ========================
+coverage/
+.jest-cache/
+
+# ========================
+# Prisma
+# ========================
+# Keep schema.prisma — ignore generated client
+apps/api/src/database/prisma/generated/
+
+# ========================
+# Logs
+# ========================
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log
+
+# ========================
+# OS
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ========================
+# IDE / Editor
+# ========================
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# Keep shared VSCode config
+!.vscode/extensions.json
+
+# ========================
+# Docker
+# ========================
+# Keep docker-compose.yml — ignore local override
+infrastructure/docker/docker-compose.override.yml
+
+# ========================
+# Vercel
+# ========================
+.vercel
+
+# ========================
+# Misc
+# ========================
+*.local
+.cache/
+.temp/
+tmp/

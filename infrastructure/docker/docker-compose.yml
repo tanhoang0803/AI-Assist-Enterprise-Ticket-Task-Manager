@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ticketmanager-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ticketmanager
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ticketmanager-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Uncomment to run API in Docker (dev usually runs locally)
+  # api:
+  #   build:
+  #     context: ../..
+  #     dockerfile: infrastructure/docker/Dockerfile.api
+  #   container_name: ticketmanager-api
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ../../.env.local
+  #   ports:
+  #     - '4000:4000'
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ../../apps/api:/app/apps/api
+  #     - /app/node_modules
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: ticketmanager-network

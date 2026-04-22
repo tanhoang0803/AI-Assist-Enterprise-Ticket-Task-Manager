@@ -1,0 +1,67 @@
+{
+  "projectName": "AI-Assist Enterprise Ticket & Task Manager",
+  "version": "0.1.0",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(docker *)",
+      "Bash(docker-compose *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git push)",
+      "Bash(prisma *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(cat *)",
+      "Bash(echo *)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(git push --force)",
+      "Bash(git reset --hard)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[Hook] Running Bash command in ticket-task_manager project'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[Hook] File written — remember to update TODO.md if this completes a task'"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development",
+    "TURBO_TEAM": "",
+    "TURBO_TOKEN": ""
+  },
+  "agents": {
+    "backend": ".claude/agents/backend-agent.md",
+    "frontend": ".claude/agents/frontend-agent.md",
+    "devops": ".claude/agents/devops-agent.md"
+  },
+  "defaultModel": "claude-sonnet-4-6"
+}

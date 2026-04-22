@@ -1,0 +1,54 @@
+# ─────────────────────────────────────────────
+# Stage 1: Builder
+# ─────────────────────────────────────────────
+FROM node:20-alpine AS builder
+
+RUN npm install -g pnpm@9
+
+WORKDIR /app
+
+# Copy workspace manifests first (layer cache)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY packages/ packages/
+COPY apps/api/package.json apps/api/package.json
+
+RUN pnpm install --frozen-lockfile
+
+# Copy API source
+COPY apps/api/ apps/api/
+
+# Generate Prisma client
+RUN pnpm --filter api exec prisma generate
+
+# Build
+RUN pnpm --filter api build
+
+# ─────────────────────────────────────────────
+# Stage 2: Runner
+# ─────────────────────────────────────────────
+FROM node:20-alpine AS runner
+
+RUN npm install -g pnpm@9
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Non-root user
+RUN addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nestjs
+
+# Copy built output only
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/package.json ./package.json
+COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/node_modules ./node_modules
+
+USER nestjs
+
+EXPOSE 4000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- http://localhost:4000/health || exit 1
+
+CMD ["node", "dist/main"]
