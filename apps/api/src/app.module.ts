@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import configuration, { configValidationSchema } from './config/configuration';
+import { PrismaModule } from './database/prisma/prisma.module';
 import { HealthModule } from './modules/health/health.module';
 
 @Module({
@@ -14,6 +15,7 @@ import { HealthModule } from './modules/health/health.module';
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    PrismaModule,
     HealthModule,
     // Phase 1.4 — DatabaseModule (Prisma)
     // Phase 1.5 — AuthModule

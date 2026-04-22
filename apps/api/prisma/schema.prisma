@@ -1,0 +1,174 @@
+// This is your Prisma schema file.
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TicketCategory {
+  BUG
+  FEATURE
+  SUPPORT
+  PERFORMANCE
+  SECURITY
+  OTHER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum AuditAction {
+  CREATED
+  UPDATED
+  DELETED
+  STATUS_CHANGED
+  ASSIGNED
+  UNASSIGNED
+  AI_PROCESSED
+}
+
+// ─────────────────────────────────────────────
+// Models
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  avatarUrl String?
+  role      UserRole @default(MEMBER)
+  auth0Id   String?  @unique
+
+  reportedTickets  Ticket[]   @relation("ReporterTickets")
+  assignedTickets  Ticket[]   @relation("AssigneeTickets")
+  tasks            Task[]
+  auditLogs        AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@map("users")
+}
+
+model Ticket {
+  id          String         @id @default(cuid())
+  title       String
+  description String?        @db.Text
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  category    TicketCategory @default(OTHER)
+  dueDate     DateTime?
+  deletedAt   DateTime?      // soft delete
+
+  reporterId String
+  reporter   User   @relation("ReporterTickets", fields: [reporterId], references: [id])
+
+  assigneeId String?
+  assignee   User?   @relation("AssigneeTickets", fields: [assigneeId], references: [id])
+
+  // AI-enriched fields (Phase 3)
+  aiCategory    String?
+  aiPriority    String?
+  aiSummary     String?   @db.Text
+  aiProcessedAt DateTime?
+
+  tasks       Task[]
+  attachments Attachment[]
+  // auditLogs queried via AuditLog.entityId (polymorphic — no FK)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([priority])
+  @@index([reporterId])
+  @@index([assigneeId])
+  @@index([deletedAt])
+  @@map("tickets")
+}
+
+model Task {
+  id     String     @id @default(cuid())
+  title  String
+  status TaskStatus @default(TODO)
+
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  assigneeId String?
+  assignee   User?   @relation(fields: [assigneeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ticketId])
+  @@map("tasks")
+}
+
+model Attachment {
+  id           String @id @default(cuid())
+  filename     String
+  url          String
+  mimeType     String
+  size         Int
+  uploadedById String
+
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@map("attachments")
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  action     AuditAction
+  entityType String      // "TICKET" | "TASK" | "USER"
+  entityId   String
+  metadata   Json?       // { before: {...}, after: {...} }
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

@@ -61,17 +61,22 @@
 - [x] Graceful shutdown hooks
 - [x] tsc --noEmit passes with zero errors
 
-### 1.4 Database — Prisma + PostgreSQL
-- [ ] Install and init Prisma in `apps/api/`
-- [ ] Configure PostgreSQL connection (Supabase URL)
-- [ ] Define initial Prisma schema:
-  - [ ] User model (id, email, name, role, createdAt)
-  - [ ] Ticket model (id, title, description, status, priority, category, assigneeId, createdAt, updatedAt)
-  - [ ] Task model (id, title, status, ticketId, assigneeId)
-  - [ ] AuditLog model (id, action, entityType, entityId, userId, metadata, createdAt)
-- [ ] Run initial migration
-- [ ] Set up Prisma service in NestJS
-- [ ] Seed script for dev data
+### 1.4 Database — Prisma + PostgreSQL ✅
+- [x] Install @prisma/client + prisma@5.22 in apps/api
+- [x] Configure PostgreSQL connection via DATABASE_URL env var
+- [x] Prisma schema (prisma/schema.prisma):
+  - [x] User — id, email, name, avatarUrl, role (ADMIN/MANAGER/MEMBER), auth0Id, timestamps
+  - [x] Ticket — full status/priority/category enums, AI fields, soft delete, composite indexes
+  - [x] Task — TaskStatus enum, cascade delete on ticket removal
+  - [x] Attachment — Phase 4 ready (filename, url, mimeType, size)
+  - [x] AuditLog — polymorphic (entityType+entityId), AuditAction enum, metadata Json
+- [x] prisma generate — client generated, tsc --noEmit passes with zero errors
+- [x] PrismaService — extends PrismaClient, slow query logging (>200ms), cleanDatabase() for test teardown
+- [x] PrismaModule — @Global(), PrismaService available in every module
+- [x] AppModule updated — PrismaModule imported
+- [x] Health check updated — memory heap + prisma pingCheck
+- [x] Seed script — 3 users, 5 tickets (all categories/statuses), 9 tasks, 7 audit logs
+- [ ] Run migration: `pnpm docker:up` then `pnpm db:migrate` (requires DATABASE_URL in .env.local)
 
 ### 1.5 Auth — Auth0 Integration
 - [ ] Create Auth0 tenant + application

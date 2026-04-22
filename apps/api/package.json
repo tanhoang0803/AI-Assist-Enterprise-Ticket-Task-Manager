@@ -26,6 +26,7 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/terminus": "^10.2.3",
     "@nestjs/throttler": "^6.1.0",
+    "@prisma/client": "^5.16.1",
     "@repo/types": "workspace:*",
     "@repo/utils": "workspace:*",
     "class-transformer": "^0.5.1",
@@ -50,9 +51,13 @@
     "jest": "^29.7.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.5",
+    "prisma": "^5.16.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "jest": {
     "moduleFileExtensions": ["js", "json", "ts"],
