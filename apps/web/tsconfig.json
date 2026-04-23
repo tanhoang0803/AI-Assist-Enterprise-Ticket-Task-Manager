@@ -4,6 +4,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@repo/ui": ["../../packages/ui/src/index.ts"],
+      "@repo/utils": ["../../packages/utils/src/index.ts"],
+      "@repo/types": ["../../packages/types/src/index.ts"],
       "@ui/*": ["../../packages/ui/src/*"],
       "@types-repo/*": ["../../packages/types/src/*"],
       "@utils/*": ["../../packages/utils/src/*"]

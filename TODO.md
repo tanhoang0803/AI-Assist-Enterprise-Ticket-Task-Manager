@@ -111,15 +111,17 @@
 - [x] Status transition validation (OPEN→IN_PROGRESS→DONE→CLOSED, with reopens)
 - [x] CreateTicketDto, UpdateTicketDto, TicketQueryDto with class-validator
 
-### 1.8 Frontend — Ticket UI
-- [ ] Tickets list page (`/tickets`)
-- [ ] Ticket detail page (`/tickets/[id]`)
-- [ ] Create ticket form / modal
-- [ ] Edit ticket form
-- [ ] Status badge component
-- [ ] Priority indicator component
-- [ ] API service layer (`services/tickets.ts`)
-- [ ] React Query hooks (`features/tickets/`)
+### 1.8 Frontend — Ticket UI ✅
+- [x] Tickets list page (`/tickets`) — table with filters (status, priority, search), pagination
+- [x] Ticket detail page (`/tickets/[id]`) — description, details sidebar, AI placeholder
+- [x] Create ticket form / modal (title, description, priority, category, due date)
+- [x] Edit ticket form modal (pre-filled, status transitions restricted to valid next states)
+- [x] TicketStatusBadge component (OPEN/IN_PROGRESS/DONE/CLOSED)
+- [x] TicketPriorityBadge component (LOW/MEDIUM/HIGH/CRITICAL)
+- [x] API service layer (`services/tickets.ts`)
+- [x] React Query hooks (`features/tickets/hooks/useTickets.ts`)
+- [x] `useCurrentUser` hook (`features/auth/hooks/useCurrentUser.ts`) for DB role
+- [x] Fixed shared package deps (clsx, tailwind-merge in @repo/utils; lucide-react, @repo/utils in @repo/ui)
 
 ### 1.9 Deployment — Phase 1
 - [ ] Docker Compose for local dev (Postgres + Redis + API)
@@ -285,8 +287,8 @@
 
 ## Current Focus
 
-**Phase 1.8 — Frontend Ticket UI**
+**Phase 1.9 — Deployment**
 
-Phases 0, 1.1–1.7 are complete. Next: build the Tickets list page, detail page, create/edit forms, React Query hooks, and API service layer.
+Phases 0, 1.1–1.8 are complete. Next: Vercel config for Next.js, Render/Railway config for NestJS, GitHub Actions CI pipeline.
 
 > Auth0 manual setup still required — see `docs/auth0-setup.md` and fill in `AUTH0_*` values in `.env.local` before testing protected endpoints.
