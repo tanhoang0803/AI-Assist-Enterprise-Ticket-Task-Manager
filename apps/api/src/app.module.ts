@@ -6,6 +6,7 @@ import { PrismaModule } from './database/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { UsersModule } from './modules/users/users.module';
     AuthModule,
     HealthModule,
     UsersModule,
-    // Phase 1.7 — TicketsModule
+    TicketsModule,
+    // Phase 2.2 — TasksModule
     // Phase 1.7 — TicketsModule
     // Phase 1.8 — TasksModule (frontend-driven)
     // Phase 2.4 — NotificationsModule

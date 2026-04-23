@@ -102,14 +102,14 @@
 - [x] `GET /users/me` — current user profile
 - [x] UpdateUserDto with class-validator decorators
 
-### 1.7 Tickets Module (Backend)
-- [ ] `POST /tickets` — create ticket
-- [ ] `GET /tickets` — list with pagination + filters
-- [ ] `GET /tickets/:id` — get ticket detail
-- [ ] `PATCH /tickets/:id` — update ticket
-- [ ] `DELETE /tickets/:id` — soft delete (ADMIN/MANAGER)
-- [ ] Status transition validation (Open → In Progress → Done → Closed)
-- [ ] CreateTicketDto, UpdateTicketDto, TicketResponseDto
+### 1.7 Tickets Module (Backend) ✅
+- [x] `POST /tickets` — create ticket (reporter = currentUser)
+- [x] `GET /tickets` — list with pagination + filters (status, priority, category, assigneeId, search)
+- [x] `GET /tickets/:id` — get ticket detail with reporter/assignee/task count
+- [x] `PATCH /tickets/:id` — update ticket (reporter/assignee/ADMIN/MANAGER)
+- [x] `DELETE /tickets/:id` — soft delete (ADMIN/MANAGER)
+- [x] Status transition validation (OPEN→IN_PROGRESS→DONE→CLOSED, with reopens)
+- [x] CreateTicketDto, UpdateTicketDto, TicketQueryDto with class-validator
 
 ### 1.8 Frontend — Ticket UI
 - [ ] Tickets list page (`/tickets`)
@@ -285,8 +285,8 @@
 
 ## Current Focus
 
-**Phase 1.7 — Tickets Module (Backend)**
+**Phase 1.8 — Frontend Ticket UI**
 
-Phases 0, 1.1–1.6 are complete. Next: implement Tickets module CRUD endpoints with status transition validation, then Phase 1.8 Frontend Ticket UI, Phase 1.9 Deployment.
+Phases 0, 1.1–1.7 are complete. Next: build the Tickets list page, detail page, create/edit forms, React Query hooks, and API service layer.
 
 > Auth0 manual setup still required — see `docs/auth0-setup.md` and fill in `AUTH0_*` values in `.env.local` before testing protected endpoints.

@@ -184,8 +184,8 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 1.4 — Prisma + PostgreSQL | ✅ Done |
 | Phase 1.5 — Auth0 Integration | ✅ Done (manual Auth0 tenant still needed) |
 | Phase 1.6 — Users Module | ✅ Done |
-| Phase 1.7 — Tickets Module | 🔄 Next |
-| Phase 1.8 — Frontend Ticket UI | 🔲 Planned |
+| Phase 1.7 — Tickets Module | ✅ Done |
+| Phase 1.8 — Frontend Ticket UI | 🔄 Next |
 | Phase 1.9 — Deployment | 🔲 Planned |
 | Phase 2+ | 🔲 Planned |
 
