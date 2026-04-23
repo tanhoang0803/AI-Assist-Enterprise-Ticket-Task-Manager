@@ -95,12 +95,12 @@
 - [x] Frontend: features/auth/hooks/useAccessToken.ts — React Query hook for access token
 - [x] Docs: docs/auth0-setup.md — step-by-step Auth0 tenant + API setup guide
 
-### 1.6 Users Module (Backend)
-- [ ] `GET /users` — list users (ADMIN only)
-- [ ] `GET /users/:id` — get user by ID
-- [ ] `PATCH /users/:id` — update profile
-- [ ] `GET /users/me` — current user profile
-- [ ] UserDTO with class-validator decorators
+### 1.6 Users Module (Backend) ✅
+- [x] `GET /users` — list users (ADMIN only)
+- [x] `GET /users/:id` — get user by ID (ADMIN/MANAGER)
+- [x] `PATCH /users/:id` — update profile (own or ADMIN-any; role change ADMIN-only)
+- [x] `GET /users/me` — current user profile
+- [x] UpdateUserDto with class-validator decorators
 
 ### 1.7 Tickets Module (Backend)
 - [ ] `POST /tickets` — create ticket
@@ -285,8 +285,8 @@
 
 ## Current Focus
 
-**Phase 1.6 — Users Module (Backend)**
+**Phase 1.7 — Tickets Module (Backend)**
 
-Phases 0, 1.1, 1.2, 1.3, 1.4, 1.5 are complete. Next: implement Users module CRUD endpoints, then Phase 1.7 Tickets Module, Phase 1.8 Frontend Ticket UI, Phase 1.9 Deployment.
+Phases 0, 1.1–1.6 are complete. Next: implement Tickets module CRUD endpoints with status transition validation, then Phase 1.8 Frontend Ticket UI, Phase 1.9 Deployment.
 
 > Auth0 manual setup still required — see `docs/auth0-setup.md` and fill in `AUTH0_*` values in `.env.local` before testing protected endpoints.
