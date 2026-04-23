@@ -186,8 +186,8 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 1.6 — Users Module | ✅ Done |
 | Phase 1.7 — Tickets Module | ✅ Done |
 | Phase 1.8 — Frontend Ticket UI | ✅ Done |
-| Phase 1.9 — Deployment | 🔄 Next |
-| Phase 2+ | 🔲 Planned |
+| Phase 1.9 — Deployment | ✅ Done |
+| Phase 2 — Core Product | 🔄 Next |
 
 See `TODO.md` for full task-level breakdown.
 

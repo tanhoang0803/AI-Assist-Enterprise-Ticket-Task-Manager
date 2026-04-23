@@ -31,7 +31,8 @@ services:
       timeout: 5s
       retries: 5
 
-  # Uncomment to run API in Docker (dev usually runs locally)
+  # Optional: run API in Docker instead of locally.
+  # Uncomment, then run: docker-compose up -d --build api
   # api:
   #   build:
   #     context: ../..
@@ -39,7 +40,12 @@ services:
   #   container_name: ticketmanager-api
   #   restart: unless-stopped
   #   env_file:
-  #     - ../../.env.local
+  #     - ../../.env.local          # provides AUTH0_*, AI keys, etc.
+  #   environment:
+  #     # Override to use internal Docker network (not host-mapped ports)
+  #     - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ticketmanager
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
   #   ports:
   #     - '4000:4000'
   #   depends_on:
@@ -47,9 +53,12 @@ services:
   #       condition: service_healthy
   #     redis:
   #       condition: service_healthy
-  #   volumes:
-  #     - ../../apps/api:/app/apps/api
-  #     - /app/node_modules
+  #   healthcheck:
+  #     test: ['CMD-SHELL', 'wget -qO- http://localhost:4000/health || exit 1']
+  #     interval: 30s
+  #     timeout: 10s
+  #     start_period: 30s
+  #     retries: 3
 
 volumes:
   postgres_data:

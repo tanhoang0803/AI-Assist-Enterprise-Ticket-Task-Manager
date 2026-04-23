@@ -123,12 +123,12 @@
 - [x] `useCurrentUser` hook (`features/auth/hooks/useCurrentUser.ts`) for DB role
 - [x] Fixed shared package deps (clsx, tailwind-merge in @repo/utils; lucide-react, @repo/utils in @repo/ui)
 
-### 1.9 Deployment — Phase 1
-- [ ] Docker Compose for local dev (Postgres + Redis + API)
-- [ ] Dockerfile for NestJS API
-- [ ] Vercel deployment config for Next.js
-- [ ] Render/Railway config for NestJS
-- [ ] GitHub Actions CI — lint + test on PR
+### 1.9 Deployment — Phase 1 ✅
+- [x] Docker Compose — API service added (commented out; uncomment to run full stack in Docker)
+- [x] Dockerfile for NestJS API (multi-stage, non-root user, HEALTHCHECK)
+- [x] Vercel deployment config (`vercel.json` — build/output/install commands)
+- [x] Render deployment config (`render.yaml` — web service, env var stubs)
+- [x] GitHub Actions CI (`.github/workflows/ci.yml` — lint, typecheck, build; deploy on merge to main)
 
 ---
 
@@ -248,11 +248,11 @@
 - [ ] Secrets rotation strategy documented
 
 ### CI/CD
-- [ ] GitHub Actions: lint on PR
-- [ ] GitHub Actions: unit tests on PR
-- [ ] GitHub Actions: build check on PR
-- [ ] GitHub Actions: auto-deploy to Vercel on merge to main
-- [ ] GitHub Actions: auto-deploy to Render on merge to main
+- [x] GitHub Actions: lint on PR
+- [ ] GitHub Actions: unit tests on PR (no tests written yet)
+- [x] GitHub Actions: build check on PR
+- [x] GitHub Actions: auto-deploy to Vercel on merge to main
+- [x] GitHub Actions: auto-deploy to Render on merge to main
 
 ### DevOps
 - [x] Docker Compose for full local stack
@@ -287,8 +287,14 @@
 
 ## Current Focus
 
-**Phase 1.9 — Deployment**
+**Phase 2 — Core Product Features**
 
-Phases 0, 1.1–1.8 are complete. Next: Vercel config for Next.js, Render/Railway config for NestJS, GitHub Actions CI pipeline.
+Phase 1 is fully complete (phases 0, 1.1–1.9). Next: Phase 2.1 Kanban Board, Phase 2.2 Tasks, Phase 2.3 Assignment & Deadlines, Phase 2.4 Notifications, Phase 2.5 Search, Phase 2.6 Audit Log.
+
+> Manual steps still required before going live:
+> - Auth0 tenant setup (see `docs/auth0-setup.md`)
+> - Set `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` in GitHub repo secrets
+> - Set `RENDER_DEPLOY_HOOK_URL` in GitHub repo secrets
+> - Set `DATABASE_URL`, `AUTH0_*` in Render dashboard env vars
 
 > Auth0 manual setup still required — see `docs/auth0-setup.md` and fill in `AUTH0_*` values in `.env.local` before testing protected endpoints.
