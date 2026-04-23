@@ -76,7 +76,7 @@
 - [x] AppModule updated — PrismaModule imported
 - [x] Health check updated — memory heap + prisma pingCheck
 - [x] Seed script — 3 users, 5 tickets (all categories/statuses), 9 tasks, 7 audit logs
-- [ ] Run migration: `pnpm docker:up` then `pnpm db:migrate` (requires DATABASE_URL in .env.local)
+- [x] Run migration: `pnpm docker:up` then `pnpm db:migrate` (requires DATABASE_URL in .env.local)
 
 ### 1.5 Auth — Auth0 Integration ✅
 - [ ] Create Auth0 tenant + application (manual — see docs/auth0-setup.md)
@@ -237,12 +237,12 @@
 ## Enterprise Practices (🟣 ONGOING)
 
 ### Security
-- [ ] Rate limiting (NestJS throttler)
-- [ ] Input validation on all endpoints (class-validator)
-- [ ] SQL injection prevention (Prisma parameterized queries — built-in)
+- [x] Rate limiting (NestJS throttler)
+- [x] Input validation on all endpoints (class-validator)
+- [x] SQL injection prevention (Prisma parameterized queries — built-in)
 - [ ] XSS prevention (output encoding in frontend)
-- [ ] Helmet middleware
-- [ ] CORS whitelist
+- [x] Helmet middleware
+- [x] CORS whitelist
 - [ ] Secrets rotation strategy documented
 
 ### CI/CD
@@ -253,10 +253,10 @@
 - [ ] GitHub Actions: auto-deploy to Render on merge to main
 
 ### DevOps
-- [ ] Docker Compose for full local stack
-- [ ] Dockerfile for API (multi-stage build)
-- [ ] Health check endpoints
-- [ ] Graceful shutdown handling in NestJS
+- [x] Docker Compose for full local stack
+- [x] Dockerfile for API (multi-stage build)
+- [x] Health check endpoints
+- [x] Graceful shutdown handling in NestJS
 - [ ] Optional: Kubernetes manifests for API deployment
 
 ### Observability
@@ -275,16 +275,18 @@
 
 ## Documentation
 
-- [ ] `docs/architecture.md` — system design overview
-- [ ] `docs/api-flow.md` — REST API endpoint map
-- [ ] `docs/ai-flow.md` — AI queue pipeline deep-dive
-- [ ] `docs/roadmap.md` — future features backlog
-- [ ] Swagger/OpenAPI auto-generated from NestJS decorators
+- [x] `docs/architecture.md` — system design overview
+- [x] `docs/api-flow.md` — REST API endpoint map
+- [x] `docs/ai-flow.md` — AI queue pipeline deep-dive
+- [x] `docs/roadmap.md` — future features backlog
+- [x] Swagger/OpenAPI auto-generated from NestJS decorators (at `/api/docs` in dev)
 
 ---
 
 ## Current Focus
 
-**Phase 1.1 — Monorepo Setup**
+**Phase 1.6 — Users Module (Backend)**
 
-Next step: Configure pnpm workspaces and Turborepo, then scaffold the Next.js and NestJS apps.
+Phases 0, 1.1, 1.2, 1.3, 1.4, 1.5 are complete. Next: implement Users module CRUD endpoints, then Phase 1.7 Tickets Module, Phase 1.8 Frontend Ticket UI, Phase 1.9 Deployment.
+
+> Auth0 manual setup still required — see `docs/auth0-setup.md` and fill in `AUTH0_*` values in `.env.local` before testing protected endpoints.

@@ -122,13 +122,25 @@ pnpm test
 pnpm lint
 pnpm typecheck
 
-# Database
-pnpm --filter api prisma:migrate
-pnpm --filter api prisma:studio
+# Docker infrastructure (Postgres :5434, Redis :6380)
+pnpm docker:up
+pnpm docker:down
 
-# Docker dev environment
-docker-compose -f infrastructure/docker/docker-compose.yml up -d
+# Database (dotenv-cli auto-loads .env.local)
+pnpm db:migrate      # prisma migrate dev
+pnpm db:seed         # prisma db seed
+pnpm db:studio       # prisma studio at :5555
+
+# Type-check API (from apps/api)
+pnpm --filter api typecheck
 ```
+
+> **Ports (non-default to avoid local conflicts)**
+> - PostgreSQL: `localhost:5434` (Docker host port)
+> - Redis: `localhost:6380` (Docker host port)
+> - Next.js frontend: `http://localhost:3000`
+> - NestJS API: `http://localhost:4000`
+> - Swagger UI: `http://localhost:4000/api/docs` (dev only)
 
 ---
 
@@ -163,7 +175,21 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 
 ## Phase Progress
 
-See `TODO.md` for current status across all phases.
+| Phase | Status |
+|---|---|
+| Phase 0 — Scaffolding | ✅ Done |
+| Phase 1.1 — Monorepo Setup | ✅ Done |
+| Phase 1.2 — Next.js App Setup | ✅ Done |
+| Phase 1.3 — NestJS App Setup | ✅ Done |
+| Phase 1.4 — Prisma + PostgreSQL | ✅ Done |
+| Phase 1.5 — Auth0 Integration | ✅ Done (manual Auth0 tenant still needed) |
+| Phase 1.6 — Users Module | 🔄 Next |
+| Phase 1.7 — Tickets Module | 🔲 Planned |
+| Phase 1.8 — Frontend Ticket UI | 🔲 Planned |
+| Phase 1.9 — Deployment | 🔲 Planned |
+| Phase 2+ | 🔲 Planned |
+
+See `TODO.md` for full task-level breakdown.
 
 ---
 

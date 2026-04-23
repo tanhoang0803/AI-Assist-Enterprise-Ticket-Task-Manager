@@ -92,27 +92,36 @@ User creates ticket → NestJS → BullMQ Queue → AI Processor
 
 ```bash
 # Clone and install
-git clone <repo-url>
+git clone https://github.com/tanhoang0803/AI-Assist-Enterprise-Ticket-Task-Manager.git
 cd ticket-task_manager
 pnpm install
 
 # Configure environment
 cp .env.example .env.local
-# Fill in values in .env.local
+# Fill in AUTH0_* and other secrets in .env.local
+# See docs/auth0-setup.md for Auth0 tenant setup guide
 
-# Start infrastructure (Postgres + Redis)
-docker-compose -f infrastructure/docker/docker-compose.yml up -d
+# Start infrastructure (Postgres + Redis via Docker)
+pnpm docker:up
 
-# Run database migrations
-pnpm --filter api prisma:migrate
+# Run database migrations + seed
+pnpm db:migrate
+pnpm db:seed
 
 # Start dev servers
 pnpm dev
 ```
 
-Frontend runs at `http://localhost:3000`  
-API runs at `http://localhost:4000`  
-Prisma Studio at `http://localhost:5555`
+| Service | URL |
+|---|---|
+| Frontend (Next.js) | `http://localhost:3000` |
+| API (NestJS) | `http://localhost:4000` |
+| Swagger UI | `http://localhost:4000/api/docs` |
+| Prisma Studio | `http://localhost:5555` |
+
+> **Note:** Docker maps Postgres to port `5434` and Redis to port `6380` to avoid conflicts with local installations. The `.env.local` `DATABASE_URL` must use port `5434`.
+
+> **Auth0 Setup Required:** Create an Auth0 tenant and fill in `AUTH0_*` values in `.env.local` before protected endpoints will work. See [docs/auth0-setup.md](docs/auth0-setup.md).
 
 ---
 
@@ -140,11 +149,13 @@ ticket-task_manager/
 
 | Phase | Status | Focus |
 |---|---|---|
-| Phase 1 — MVP Core | 🔴 In Progress | Next.js + NestJS + Auth + DB |
+| Phase 0 — Scaffolding | ✅ Done | Monorepo, configs, directory structure |
+| Phase 1.1–1.5 — Foundation | ✅ Done | Next.js, NestJS, Prisma, Auth0 |
+| Phase 1.6–1.9 — MVP Completion | 🔄 In Progress | Users/Tickets CRUD, Frontend UI, Deployment |
 | Phase 2 — Core Product | 🔲 Planned | Kanban, Notifications, Search, Audit |
-| Phase 3 — AI Layer | 🔲 Planned | Queue + AI auto-processing |
+| Phase 3 — AI Layer | 🔲 Planned | BullMQ + AI auto-processing |
 | Phase 4 — Integrations | 🔲 Planned | Google Calendar, File Uploads |
-| Enterprise Practices | 🔲 Ongoing | CI/CD, Docker, RBAC, Redis cache |
+| Enterprise Practices | 🔄 Ongoing | CI/CD, RBAC, Redis cache, Observability |
 
 See `TODO.md` for detailed task breakdown.
 
