@@ -10,8 +10,8 @@ export const configValidationSchema = Joi.object({
   REDIS_PORT: Joi.number().default(6379),
   REDIS_PASSWORD: Joi.string().allow('').optional(),
 
-  AUTH0_DOMAIN: Joi.string().required(),
-  AUTH0_AUDIENCE: Joi.string().required(),
+  AUTH0_DOMAIN: Joi.string().optional().default(''),
+  AUTH0_AUDIENCE: Joi.string().optional().default(''),
 
   HUGGINGFACE_API_KEY: Joi.string().optional(),
   OPENAI_API_KEY: Joi.string().optional(),
