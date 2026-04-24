@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { TicketsModule } from './modules/tickets/tickets.module';
     HealthModule,
     UsersModule,
     TicketsModule,
-    // Phase 2.2 — TasksModule
+    TasksModule,
     // Phase 1.7 — TicketsModule
     // Phase 1.8 — TasksModule (frontend-driven)
     // Phase 2.4 — NotificationsModule

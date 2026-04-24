@@ -8,6 +8,7 @@ import { useTicket } from '@/features/tickets/hooks/useTickets';
 import { TicketStatusBadge } from '@/features/tickets/components/TicketStatusBadge';
 import { TicketPriorityBadge } from '@/features/tickets/components/TicketPriorityBadge';
 import { EditTicketModal } from '@/features/tickets/components/EditTicketModal';
+import { TaskChecklist } from '@/features/tickets/components/TaskChecklist';
 
 interface Props {
   params: { id: string };
@@ -76,12 +77,7 @@ export default function TicketDetailPage({ params }: Props) {
 
           {/* Tasks */}
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-semibold text-gray-700">
-              Tasks ({ticket._count.tasks})
-            </h2>
-            <p className="mt-3 text-sm italic text-gray-400">
-              Task management available in Phase 2.
-            </p>
+            <TaskChecklist ticketId={ticket.id} />
           </div>
 
           {/* AI Analysis */}
