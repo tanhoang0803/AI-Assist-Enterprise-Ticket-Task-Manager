@@ -39,6 +39,9 @@ export interface TicketFilters {
   category?: TicketCategory;
   assigneeId?: string;
   search?: string;
+  overdue?: boolean;
+  dueBefore?: string;
+  dueAfter?: string;
   page?: number;
   limit?: number;
 }

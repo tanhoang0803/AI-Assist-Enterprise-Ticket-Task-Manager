@@ -23,6 +23,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('assignable')
+  @ApiOperation({ summary: 'List assignable users (id, name, avatar) — any authenticated user' })
+  findAssignable() {
+    return this.usersService.findAssignable();
+  }
+
   // Declared before :id so NestJS routes "me" as a literal, not a param
   @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })

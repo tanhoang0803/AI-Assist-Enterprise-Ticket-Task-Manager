@@ -1,6 +1,6 @@
-import { IsOptional, IsEnum, IsString, IsInt, Min, Max } from 'class-validator';
+import { IsOptional, IsEnum, IsString, IsInt, IsBoolean, IsDateString, Min, Max } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { TicketStatus, TicketPriority, TicketCategory } from '@repo/types';
 
 export class TicketQueryDto {
@@ -28,6 +28,22 @@ export class TicketQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiPropertyOptional({ description: 'Only tickets past their due date and not closed/done' })
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  overdue?: boolean;
+
+  @ApiPropertyOptional({ description: 'ISO date — tickets due before this date' })
+  @IsOptional()
+  @IsDateString()
+  dueBefore?: string;
+
+  @ApiPropertyOptional({ description: 'ISO date — tickets due after this date' })
+  @IsOptional()
+  @IsDateString()
+  dueAfter?: string;
 
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()

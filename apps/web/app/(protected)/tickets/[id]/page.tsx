@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Pencil, Cpu } from 'lucide-react';
-import { formatDate, formatDateTime } from '@repo/utils';
+import { formatDate, formatDateTime, isOverdue } from '@repo/utils';
 import { useTicket } from '@/features/tickets/hooks/useTickets';
 import { TicketStatusBadge } from '@/features/tickets/components/TicketStatusBadge';
 import { TicketPriorityBadge } from '@/features/tickets/components/TicketPriorityBadge';
@@ -162,8 +162,25 @@ export default function TicketDetailPage({ params }: Props) {
                   <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">
                     Due Date
                   </dt>
-                  <dd className="mt-1 font-medium text-gray-700">
-                    {formatDate(ticket.dueDate)}
+                  <dd className="mt-1 flex items-center gap-2">
+                    <span
+                      className={`font-medium ${
+                        isOverdue(ticket.dueDate) &&
+                        ticket.status !== 'DONE' &&
+                        ticket.status !== 'CLOSED'
+                          ? 'text-red-600'
+                          : 'text-gray-700'
+                      }`}
+                    >
+                      {formatDate(ticket.dueDate)}
+                    </span>
+                    {isOverdue(ticket.dueDate) &&
+                      ticket.status !== 'DONE' &&
+                      ticket.status !== 'CLOSED' && (
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                          Overdue
+                        </span>
+                      )}
                   </dd>
                 </div>
               )}

@@ -59,15 +59,40 @@ export class TicketsService {
   }
 
   async findAll(query: TicketQueryDto) {
-    const { status, priority, category, assigneeId, search, page = 1, limit = 20 } = query;
+    const {
+      status,
+      priority,
+      category,
+      assigneeId,
+      search,
+      overdue,
+      dueBefore,
+      dueAfter,
+      page = 1,
+      limit = 20,
+    } = query;
     const skip = (page - 1) * limit;
+
+    // Build dueDate range filter; dueBefore/dueAfter override the overdue implicit lt
+    const dueDateFilter: { lt?: Date; gt?: Date } = {};
+    if (overdue) dueDateFilter.lt = new Date();
+    if (dueBefore) dueDateFilter.lt = new Date(dueBefore);
+    if (dueAfter) dueDateFilter.gt = new Date(dueAfter);
+
+    // overdue implies status not closed — unless caller explicitly picked a status
+    const statusCondition = status
+      ? { status }
+      : overdue
+        ? { status: { notIn: [TicketStatus.DONE, TicketStatus.CLOSED] } }
+        : {};
 
     const where = {
       deletedAt: null,
-      ...(status && { status }),
+      ...statusCondition,
       ...(priority && { priority }),
       ...(category && { category }),
       ...(assigneeId && { assigneeId }),
+      ...(Object.keys(dueDateFilter).length > 0 && { dueDate: dueDateFilter }),
       ...(search && {
         OR: [
           { title: { contains: search, mode: 'insensitive' as const } },

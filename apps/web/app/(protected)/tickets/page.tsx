@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { TicketStatus, TicketPriority, UserRole } from '@repo/types';
+import { isOverdue } from '@repo/utils';
 import { formatDate } from '@repo/utils';
 import { useTickets, useDeleteTicket } from '@/features/tickets/hooks/useTickets';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
@@ -96,6 +97,35 @@ export default function TicketsPage() {
             </option>
           ))}
         </select>
+
+        {/* Quick-filter buttons */}
+        {currentUser && (
+          <button
+            onClick={() =>
+              setFilter(
+                'assigneeId',
+                filters.assigneeId === currentUser.id ? undefined : currentUser.id,
+              )
+            }
+            className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+              filters.assigneeId === currentUser.id
+                ? 'border-blue-600 bg-blue-50 text-blue-700'
+                : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Assigned to me
+          </button>
+        )}
+        <button
+          onClick={() => setFilter('overdue', filters.overdue ? undefined : true)}
+          className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+            filters.overdue
+              ? 'border-red-500 bg-red-50 text-red-700'
+              : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          Overdue
+        </button>
       </div>
 
       {/* Table */}
@@ -165,9 +195,19 @@ export default function TicketsPage() {
                       <span className="text-gray-300">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-4 py-3">
                     {ticket.dueDate ? (
-                      formatDate(ticket.dueDate)
+                      <span
+                        className={
+                          isOverdue(ticket.dueDate) &&
+                          ticket.status !== TicketStatus.DONE &&
+                          ticket.status !== TicketStatus.CLOSED
+                            ? 'font-medium text-red-600'
+                            : 'text-gray-500'
+                        }
+                      >
+                        {formatDate(ticket.dueDate)}
+                      </span>
                     ) : (
                       <span className="text-gray-300">—</span>
                     )}

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Modal } from '@repo/ui';
 import { TicketPriority, TicketCategory } from '@repo/types';
 import { useCreateTicket } from '../hooks/useTickets';
+import { useAssignableUsers } from '../hooks/useUsers';
 import type { CreateTicketInput } from '@/services/tickets';
 
 interface Props {
@@ -23,6 +24,7 @@ const defaultForm: CreateTicketInput = {
 
 export function CreateTicketModal({ isOpen, onClose }: Props) {
   const { mutate: createTicket, isPending } = useCreateTicket();
+  const { data: users = [] } = useAssignableUsers();
   const [form, setForm] = useState<CreateTicketInput>(defaultForm);
   const [error, setError] = useState('');
 
@@ -110,14 +112,31 @@ export function CreateTicketModal({ isOpen, onClose }: Props) {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Due Date</label>
-          <input
-            type="date"
-            value={form.dueDate ?? ''}
-            onChange={(e) => set('dueDate', e.target.value || undefined)}
-            className={inputClass}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Assignee</label>
+            <select
+              value={form.assigneeId ?? ''}
+              onChange={(e) => set('assigneeId', e.target.value || undefined)}
+              className={inputClass}
+            >
+              <option value="">Unassigned</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Due Date</label>
+            <input
+              type="date"
+              value={form.dueDate ?? ''}
+              onChange={(e) => set('dueDate', e.target.value || undefined)}
+              className={inputClass}
+            />
+          </div>
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

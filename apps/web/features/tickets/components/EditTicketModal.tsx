@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Modal } from '@repo/ui';
 import { TicketStatus, TicketPriority, TicketCategory } from '@repo/types';
 import { useUpdateTicket } from '../hooks/useTickets';
+import { useAssignableUsers } from '../hooks/useUsers';
 import type { Ticket, UpdateTicketInput } from '@/services/tickets';
 
 const VALID_NEXT: Record<TicketStatus, TicketStatus[]> = {
@@ -29,12 +30,14 @@ function ticketToForm(t: Ticket): UpdateTicketInput {
     status: t.status,
     priority: t.priority,
     category: t.category,
+    assigneeId: t.assigneeId ?? undefined,
     dueDate: t.dueDate ? t.dueDate.split('T')[0] : '',
   };
 }
 
 export function EditTicketModal({ ticket, isOpen, onClose }: Props) {
   const { mutate: updateTicket, isPending } = useUpdateTicket();
+  const { data: users = [] } = useAssignableUsers();
   const [form, setForm] = useState<UpdateTicketInput>(() => ticketToForm(ticket));
   const [error, setError] = useState('');
 
@@ -61,6 +64,7 @@ export function EditTicketModal({ ticket, isOpen, onClose }: Props) {
       status: form.status,
       priority: form.priority,
       category: form.category,
+      assigneeId: form.assigneeId ?? null,
       dueDate: (form.dueDate as string) || null,
     };
     updateTicket(
@@ -155,6 +159,22 @@ export function EditTicketModal({ ticket, isOpen, onClose }: Props) {
               className={inputClass}
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Assignee</label>
+          <select
+            value={form.assigneeId ?? ''}
+            onChange={(e) => set('assigneeId', e.target.value || undefined)}
+            className={inputClass}
+          >
+            <option value="">Unassigned</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

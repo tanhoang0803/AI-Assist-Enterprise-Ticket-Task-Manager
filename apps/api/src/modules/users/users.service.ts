@@ -25,6 +25,13 @@ export class UsersService {
     });
   }
 
+  findAssignable() {
+    return this.prisma.user.findMany({
+      select: { id: true, name: true, avatarUrl: true },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
