@@ -4,27 +4,31 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @repo/types build && pnpm --filter @repo/utils build && pnpm --filter api prisma:generate && pnpm --filter api build
+    buildCommand: >
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @repo/types build &&
+      pnpm --filter @repo/utils build &&
+      pnpm --filter api prisma:generate &&
+      pnpm --filter api exec prisma migrate deploy &&
+      pnpm --filter api build
     startCommand: node apps/api/dist/main
     healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 4000
-      # Set the following secrets in the Render dashboard:
+      # Set the following secrets in the Render dashboard (sync: false = manual entry):
       - key: DATABASE_URL
         sync: false
-      - key: REDIS_HOST
-        sync: false
-      - key: REDIS_PORT
+      - key: DIRECT_URL
         sync: false
       - key: AUTH0_DOMAIN
         sync: false
       - key: AUTH0_AUDIENCE
         sync: false
-      - key: NEXT_PUBLIC_APP_URL
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
         sync: false
       - key: HUGGINGFACE_API_KEY
         sync: false
