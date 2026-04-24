@@ -4,7 +4,7 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter api prisma:generate && pnpm --filter api build
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @repo/types build && pnpm --filter @repo/utils build && pnpm --filter api prisma:generate && pnpm --filter api build
     startCommand: node apps/api/dist/main
     healthCheckPath: /health
     autoDeploy: true
