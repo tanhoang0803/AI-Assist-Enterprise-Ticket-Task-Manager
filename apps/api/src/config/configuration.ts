@@ -10,6 +10,7 @@ export const configValidationSchema = Joi.object({
   REDIS_PORT: Joi.number().default(6379),
   REDIS_PASSWORD: Joi.string().allow('').optional(),
 
+  NEXT_PUBLIC_APP_URL: Joi.string().default('http://localhost:3000'),
   AUTH0_DOMAIN: Joi.string().optional().default(''),
   AUTH0_AUDIENCE: Joi.string().optional().default(''),
 

@@ -8,6 +8,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "build": "echo 'ui: no compile step (transpiled by Next.js)'"
+  },
   "dependencies": {
     "@repo/utils": "workspace:*",
     "lucide-react": "^0.400.0"

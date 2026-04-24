@@ -2,9 +2,7 @@
 set -e
 
 echo "Running database migrations..."
-cd apps/api
-../../node_modules/.bin/prisma migrate deploy
-cd ../..
+pnpm --filter api exec prisma migrate deploy
 
 echo "Starting API..."
 exec node apps/api/dist/main
