@@ -9,9 +9,8 @@ services:
       pnpm --filter @repo/types build &&
       pnpm --filter @repo/utils build &&
       pnpm --filter api prisma:generate &&
-      pnpm --filter api exec prisma migrate deploy &&
       pnpm --filter api build
-    startCommand: node apps/api/dist/main
+    startCommand: sh start.sh
     healthCheckPath: /health
     autoDeploy: true
     envVars:
