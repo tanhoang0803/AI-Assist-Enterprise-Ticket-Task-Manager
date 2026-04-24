@@ -1,27 +1,18 @@
 import type { Metadata } from 'next';
+import { KanbanBoard } from '@/features/tickets/components/KanbanBoard';
 
-export const metadata: Metadata = { title: 'Dashboard' };
+export const metadata: Metadata = { title: 'Kanban Board' };
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-500">Kanban board — coming in Phase 2</p>
+        <h1 className="text-2xl font-bold text-gray-900">Kanban Board</h1>
+        <p className="mt-0.5 text-sm text-gray-500">
+          Drag tickets between columns to update status
+        </p>
       </div>
-
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        {(['Open', 'In Progress', 'Done'] as const).map((col) => (
-          <div key={col} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
-              {col}
-            </h2>
-            <div className="space-y-2">
-              <p className="text-xs text-gray-400 italic">No tickets yet</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <KanbanBoard />
     </div>
   );
 }
