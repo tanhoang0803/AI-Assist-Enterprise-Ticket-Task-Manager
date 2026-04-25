@@ -12,14 +12,29 @@ A production-like system demonstrating how modern enterprise software is designe
 
 ---
 
+## Live Features
+
+| Feature | Details |
+|---|---|
+| **Ticket management** | Create, edit, filter, soft-delete; status workflow OPEN → IN_PROGRESS → DONE → CLOSED with transition guards |
+| **Kanban board** | Drag-and-drop across columns (`@dnd-kit`), optimistic updates, invalid-target dimming, DragOverlay preview |
+| **Task checklist** | Per-ticket subtasks with progress bar, checkbox toggle (optimistic), add/delete inline |
+| **Assignment** | Assignee selector on create/edit modals; "Assigned to me" quick-filter; `GET /users/assignable` |
+| **Deadlines** | Due date picker; overdue detection (red highlight on list + detail + Kanban card); `?overdue=true` API filter |
+| **Search & filters** | Debounced full-text search on title+description; filter by status, priority, overdue |
+| **Authentication** | Auth0 JWT (RS256); auto-upsert user on login; RBAC (ADMIN / MANAGER / MEMBER) |
+| **Deployment** | Vercel (frontend) + Render (backend); GitHub Actions CI: lint → typecheck → build → deploy |
+
+---
+
 ## Core Capabilities
 
-- **Ticket & Task Management** — CRUD, Kanban board, status workflows (Open → In Progress → Done), assignments and deadlines
-- **AI-Assisted Automation** — auto-categorization, priority scoring, ticket summarization via async queue processing
-- **Real-Time Notifications** — Slack webhooks, email via SendGrid
-- **Authentication & Authorization** — JWT, Auth0, RBAC
-- **Audit Logging** — full activity trail for enterprise compliance feel
-- **Async Queue Processing** — BullMQ + Redis decouples heavy AI jobs from request lifecycle
+- **Ticket & Task Management** — CRUD, Kanban board, status workflows with enforced transitions, assignments and deadlines
+- **AI-Assisted Automation** *(Phase 3)* — auto-categorization, priority scoring, ticket summarization via async queue processing
+- **Notifications** *(Phase 2.4)* — Slack webhooks, email via SendGrid on ticket events
+- **Authentication & Authorization** — JWT, Auth0, RBAC guards on all protected endpoints
+- **Audit Logging** *(Phase 2.6)* — full activity trail for enterprise compliance
+- **Async Queue Processing** *(Phase 3)* — BullMQ + Redis decouples heavy AI jobs from request lifecycle
 
 ---
 
@@ -130,17 +145,25 @@ pnpm dev
 ```
 ticket-task_manager/
 ├── apps/
-│   ├── web/          # Next.js frontend
-│   └── api/          # NestJS backend
+│   ├── web/                    # Next.js 14 frontend
+│   │   ├── app/(protected)/    # Auth-guarded pages (dashboard, tickets)
+│   │   ├── features/tickets/   # Ticket components, hooks, Kanban board
+│   │   └── services/           # API client wrappers (tickets, tasks, users)
+│   └── api/                    # NestJS backend
+│       └── src/modules/
+│           ├── auth/           # JWT strategy, Auth0 sync
+│           ├── users/          # User CRUD + assignable endpoint
+│           ├── tickets/        # Ticket CRUD + filters
+│           └── tasks/          # Task CRUD per ticket
 ├── packages/
-│   ├── ui/           # Shared UI components
-│   ├── types/        # Shared TypeScript types
-│   ├── utils/        # Shared utilities
-│   └── config/       # Shared lint/tsconfig
-├── infrastructure/   # Docker, CI/CD, K8s
-├── docs/             # Architecture docs
-├── .claude/          # AI development tooling
-└── scripts/          # Dev scripts
+│   ├── ui/           # Shared React components (Modal, Badge, etc.)
+│   ├── types/        # Shared TypeScript types & enums
+│   ├── utils/        # Shared utilities (formatDate, isOverdue, cn)
+│   └── config/       # Shared eslint / tsconfig presets
+├── infrastructure/   # Docker Compose, Dockerfile, K8s manifests
+├── docs/             # Architecture, API flow, AI flow, Auth0 setup guide
+├── .claude/          # AI development system (agents, skills, memory)
+└── scripts/          # Dev & ops utility scripts
 ```
 
 ---
@@ -151,9 +174,14 @@ ticket-task_manager/
 |---|---|---|
 | Phase 0 — Scaffolding | ✅ Done | Monorepo, configs, directory structure |
 | Phase 1.1–1.5 — Foundation | ✅ Done | Next.js, NestJS, Prisma, Auth0 |
-| Phase 1.6–1.9 — MVP Completion | 🔄 In Progress | Users/Tickets CRUD, Frontend UI, Deployment |
-| Phase 2 — Core Product | 🔲 Planned | Kanban, Notifications, Search, Audit |
-| Phase 3 — AI Layer | 🔲 Planned | BullMQ + AI auto-processing |
+| Phase 1.6–1.9 — MVP Completion | ✅ Done | Users/Tickets CRUD, Frontend UI, Deployment |
+| Phase 2.1 — Kanban Board | ✅ Done | Drag-and-drop board with optimistic updates |
+| Phase 2.2 — Tasks | ✅ Done | Per-ticket task checklist with progress tracking |
+| Phase 2.3 — Assignment & Deadlines | ✅ Done | Assignee selector, overdue filters, due date indicators |
+| Phase 2.4 — Notifications | 🔄 Next | Slack webhooks + SendGrid email |
+| Phase 2.5 — Search | 🔲 Planned | Full-text search across tickets |
+| Phase 2.6 — Audit Log | 🔲 Planned | Activity trail, compliance logging |
+| Phase 3 — AI Layer | 🔲 Planned | BullMQ + Hugging Face auto-processing |
 | Phase 4 — Integrations | 🔲 Planned | Google Calendar, File Uploads |
 | Enterprise Practices | 🔄 Ongoing | CI/CD, RBAC, Redis cache, Observability |
 

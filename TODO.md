@@ -97,14 +97,15 @@
 
 ### 1.6 Users Module (Backend) ✅
 - [x] `GET /users` — list users (ADMIN only)
+- [x] `GET /users/me` — current user profile
+- [x] `GET /users/assignable` — minimal user list (id, name, avatar) for any authenticated user
 - [x] `GET /users/:id` — get user by ID (ADMIN/MANAGER)
 - [x] `PATCH /users/:id` — update profile (own or ADMIN-any; role change ADMIN-only)
-- [x] `GET /users/me` — current user profile
 - [x] UpdateUserDto with class-validator decorators
 
 ### 1.7 Tickets Module (Backend) ✅
 - [x] `POST /tickets` — create ticket (reporter = currentUser)
-- [x] `GET /tickets` — list with pagination + filters (status, priority, category, assigneeId, search)
+- [x] `GET /tickets` — list with pagination + filters (status, priority, category, assigneeId, search, overdue, dueBefore, dueAfter)
 - [x] `GET /tickets/:id` — get ticket detail with reporter/assignee/task count
 - [x] `PATCH /tickets/:id` — update ticket (reporter/assignee/ADMIN/MANAGER)
 - [x] `DELETE /tickets/:id` — soft delete (ADMIN/MANAGER)
@@ -112,15 +113,16 @@
 - [x] CreateTicketDto, UpdateTicketDto, TicketQueryDto with class-validator
 
 ### 1.8 Frontend — Ticket UI ✅
-- [x] Tickets list page (`/tickets`) — table with filters (status, priority, search), pagination
-- [x] Ticket detail page (`/tickets/[id]`) — description, details sidebar, AI placeholder
-- [x] Create ticket form / modal (title, description, priority, category, due date)
-- [x] Edit ticket form modal (pre-filled, status transitions restricted to valid next states)
+- [x] Tickets list page (`/tickets`) — table with filters (status, priority, search, assigned to me, overdue), pagination
+- [x] Ticket detail page (`/tickets/[id]`) — description, details sidebar, overdue badge
+- [x] Create ticket form / modal (title, description, priority, category, assignee, due date)
+- [x] Edit ticket form modal (pre-filled, status transitions restricted to valid next states, assignee selector)
 - [x] TicketStatusBadge component (OPEN/IN_PROGRESS/DONE/CLOSED)
 - [x] TicketPriorityBadge component (LOW/MEDIUM/HIGH/CRITICAL)
-- [x] API service layer (`services/tickets.ts`)
-- [x] React Query hooks (`features/tickets/hooks/useTickets.ts`)
+- [x] API service layer (`services/tickets.ts`, `services/tasks.ts`, `services/users.ts`)
+- [x] React Query hooks (`useTickets`, `useTasks`, `useAssignableUsers`, `useKanban`)
 - [x] `useCurrentUser` hook (`features/auth/hooks/useCurrentUser.ts`) for DB role
+- [x] `useDebounce` hook — used for debounced search on tickets list
 - [x] Fixed shared package deps (clsx, tailwind-merge in @repo/utils; lucide-react, @repo/utils in @repo/ui)
 
 ### 1.9 Deployment — Phase 1 ✅
@@ -134,25 +136,30 @@
 
 ## Phase 2 — Core Product Features (🟡 DAILY USE)
 
-### 2.1 Kanban Board
-- [ ] Kanban board page (`/dashboard`)
-- [ ] Drag-and-drop columns (Open / In Progress / Done)
-- [ ] @dnd-kit/sortable integration
-- [ ] Optimistic updates with React Query
-- [ ] Column card component with ticket summary
+### 2.1 Kanban Board ✅
+- [x] Kanban board page (`/dashboard`)
+- [x] Drag-and-drop columns (Open / In Progress / Done)
+- [x] @dnd-kit/sortable integration
+- [x] Optimistic updates with React Query
+- [x] Column card component with ticket summary
+- [x] Invalid drop targets dimmed during drag
+- [x] DragOverlay floating card preview
 
-### 2.2 Tasks (Kanban Subtasks)
-- [ ] Tasks module in backend
-- [ ] `POST /tickets/:id/tasks`
-- [ ] `PATCH /tasks/:id`
-- [ ] `DELETE /tasks/:id`
-- [ ] Task checklist component in frontend
+### 2.2 Tasks (Kanban Subtasks) ✅
+- [x] Tasks module in backend
+- [x] `GET /tickets/:id/tasks`
+- [x] `POST /tickets/:id/tasks`
+- [x] `PATCH /tasks/:id`
+- [x] `DELETE /tasks/:id`
+- [x] Task checklist component in frontend (progress bar, checkbox toggle, add/delete)
 
-### 2.3 Assignment & Deadlines
-- [ ] Assignee field on tickets
-- [ ] Due date picker
-- [ ] "Assigned to me" filter
-- [ ] Overdue indicator
+### 2.3 Assignment & Deadlines ✅
+- [x] Assignee selector dropdown on CreateTicketModal and EditTicketModal
+- [x] `GET /users/assignable` endpoint (any authenticated user)
+- [x] "Assigned to me" quick-filter button on tickets list
+- [x] Overdue filter toggle on tickets list
+- [x] Overdue due dates highlighted in red (list + detail pages)
+- [x] overdue/dueBefore/dueAfter query params on `GET /tickets`
 
 ### 2.4 Notifications Module
 - [ ] Slack integration
@@ -164,11 +171,11 @@
   - [ ] Email templates (ticket created, assigned)
   - [ ] Trigger on: assignment
 
-### 2.5 Search
-- [ ] PostgreSQL full-text search on tickets (title + description)
-- [ ] `GET /tickets?search=...` query param
-- [ ] Search bar component in frontend
-- [ ] Debounced search hook
+### 2.5 Search ✅
+- [x] `GET /tickets?search=...` query param (ILIKE on title + description — implemented in Phase 1.7)
+- [x] Search bar component in frontend (implemented in Phase 1.8)
+- [x] Debounced search hook (`useDebounce` — implemented in Phase 1.2)
+- [ ] PostgreSQL full-text search upgrade (tsvector/tsquery + GIN index — optional optimization)
 
 ### 2.6 Audit Log
 - [ ] AuditLog module (backend)
@@ -269,8 +276,8 @@
 
 ### Performance
 - [ ] Redis caching layer for hot queries
-- [ ] Prisma query optimization (select, include only needed fields)
-- [ ] Pagination on all list endpoints
+- [x] Prisma query optimization (explicit `select` on all queries — no over-fetching)
+- [x] Pagination on all list endpoints (`page` + `limit` with meta on `/tickets`)
 - [ ] Image optimization (Next.js built-in)
 
 ---
@@ -289,12 +296,13 @@
 
 **Phase 2 — Core Product Features**
 
-Phase 1 is fully complete (phases 0, 1.1–1.9). Next: Phase 2.1 Kanban Board, Phase 2.2 Tasks, Phase 2.3 Assignment & Deadlines, Phase 2.4 Notifications, Phase 2.5 Search, Phase 2.6 Audit Log.
+Phases 0, 1.1–1.9, 2.1, 2.2, and 2.3 are complete. Next: Phase 2.4 Notifications, Phase 2.5 Search, Phase 2.6 Audit Log.
 
 > Manual steps still required before going live:
 > - Auth0 tenant setup (see `docs/auth0-setup.md`)
-> - Set `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` in GitHub repo secrets
 > - Set `RENDER_DEPLOY_HOOK_URL` in GitHub repo secrets
 > - Set `DATABASE_URL`, `AUTH0_*` in Render dashboard env vars
+> - Set `SLACK_BOT_TOKEN` in Render dashboard for Phase 2.4
+> - Set `SENDGRID_API_KEY` in Render dashboard for Phase 2.4
 
 > Auth0 manual setup still required — see `docs/auth0-setup.md` and fill in `AUTH0_*` values in `.env.local` before testing protected endpoints.

@@ -51,16 +51,17 @@ ticket-task_manager/
 
 ## Backend Module Map (`apps/api/src/modules/`)
 
-| Module | Responsibility |
-|---|---|
-| `auth` | JWT validation, Auth0/Firebase integration, RBAC guards |
-| `users` | User CRUD, roles, profile management |
-| `tickets` | Ticket lifecycle, status transitions, assignment |
-| `tasks` | Kanban subtasks, checklists |
-| `notifications` | Slack webhook, SendGrid email dispatch |
-| `ai` | AI analysis orchestration, model calls |
-| `workflow` | Automation rules, triggers |
-| `logs` | Audit trail, activity log |
+| Module | Status | Responsibility |
+|---|---|---|
+| `auth` | ✅ Live | JWT validation, Auth0 integration, RBAC guards |
+| `users` | ✅ Live | User CRUD, roles, profile, `GET /users/assignable` |
+| `tickets` | ✅ Live | Ticket lifecycle, status transitions, assignment, overdue filters |
+| `tasks` | ✅ Live | Per-ticket task CRUD, checklist |
+| `health` | ✅ Live | Memory heap + Prisma ping health check |
+| `notifications` | 🔲 Phase 2.4 | Slack webhook, SendGrid email dispatch |
+| `logs` | 🔲 Phase 2.6 | Audit trail, activity log |
+| `ai` | 🔲 Phase 3 | AI analysis orchestration, Hugging Face / OpenAI |
+| `workflow` | 🔲 Phase 3+ | Automation rules, triggers |
 
 ---
 
@@ -115,12 +116,18 @@ pnpm --filter api dev
 # Build all
 pnpm build
 
+# Build shared packages (required before building apps)
+pnpm --filter @repo/types build
+pnpm --filter @repo/utils build
+
 # Run tests
 pnpm test
 
 # Lint + type-check
 pnpm lint
 pnpm typecheck
+pnpm --filter api typecheck
+pnpm --filter web typecheck
 
 # Docker infrastructure (Postgres :5434, Redis :6380)
 pnpm docker:up
@@ -130,9 +137,7 @@ pnpm docker:down
 pnpm db:migrate      # prisma migrate dev
 pnpm db:seed         # prisma db seed
 pnpm db:studio       # prisma studio at :5555
-
-# Type-check API (from apps/api)
-pnpm --filter api typecheck
+pnpm --filter api prisma:generate   # regenerate Prisma client after schema changes
 ```
 
 > **Ports (non-default to avoid local conflicts)**
@@ -187,7 +192,14 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 1.7 — Tickets Module | ✅ Done |
 | Phase 1.8 — Frontend Ticket UI | ✅ Done |
 | Phase 1.9 — Deployment | ✅ Done |
-| Phase 2 — Core Product | 🔄 Next |
+| Phase 2.1 — Kanban Board | ✅ Done |
+| Phase 2.2 — Tasks (Checklist) | ✅ Done |
+| Phase 2.3 — Assignment & Deadlines | ✅ Done |
+| Phase 2.4 — Notifications | 🔄 Next |
+| Phase 2.5 — Search | 🔲 Planned |
+| Phase 2.6 — Audit Log | 🔲 Planned |
+| Phase 3 — AI Layer | 🔲 Planned |
+| Phase 4 — Integrations | 🔲 Planned |
 
 See `TODO.md` for full task-level breakdown.
 
