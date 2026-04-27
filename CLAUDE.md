@@ -16,12 +16,12 @@ ticket-task_manager/
 ├── apps/
 │   ├── web/                    # Next.js 14 · TypeScript · TailwindCSS · App Router
 │   │   ├── app/(protected)/    # Auth-guarded pages: dashboard (Kanban), tickets, tickets/[id]
-│   │   ├── features/tickets/   # Components, hooks (useTickets, useTasks, useKanban, useUsers)
-│   │   └── services/           # API wrappers: tickets.ts, tasks.ts, users.ts, api.ts
+│   │   ├── features/tickets/   # Components, hooks (useTickets, useTasks, useKanban, useUsers, useLogs)
+│   │   └── services/           # API wrappers: tickets.ts, tasks.ts, users.ts, logs.ts, api.ts
 │   └── api/                    # NestJS · TypeScript · Prisma (BullMQ — Phase 3)
 │       ├── prisma/             # schema.prisma, migrations, seed.ts
 │       └── src/
-│           ├── modules/        # auth, users, tickets, tasks, health
+│           ├── modules/        # auth, users, tickets, tasks, notifications, logs, health
 │           ├── common/         # guards, decorators, interceptors, filters
 │           ├── config/         # configuration.ts, Joi validation schema
 │           └── database/       # PrismaModule, PrismaService
@@ -69,8 +69,8 @@ ticket-task_manager/
 | `tickets` | ✅ Live | Ticket lifecycle, status transitions, assignment, overdue filters |
 | `tasks` | ✅ Live | Per-ticket task CRUD, checklist |
 | `health` | ✅ Live | Memory heap + Prisma ping health check |
-| `notifications` | 🔲 Phase 2.4 | Slack webhook, SendGrid email dispatch |
-| `logs` | 🔲 Phase 2.6 | Audit trail, activity log |
+| `notifications` | ✅ Live | Slack webhook (chat.postMessage), SendGrid email on assignment |
+| `logs` | ✅ Live | Audit trail (CREATED/UPDATED/STATUS_CHANGED/ASSIGNED/DELETED), `GET /logs` |
 | `ai` | 🔲 Phase 3 | AI analysis orchestration, Hugging Face / OpenAI |
 | `workflow` | 🔲 Phase 3+ | Automation rules, triggers |
 
@@ -95,6 +95,7 @@ ticket-task_manager/
 | POST | `/api/tickets/:id/tasks` | JWT | Create task |
 | PATCH | `/api/tasks/:id` | JWT | Update task title/status |
 | DELETE | `/api/tasks/:id` | JWT | Delete task |
+| GET | `/api/logs` | JWT | Paginated audit log (filter by entityType + entityId) |
 
 ---
 
@@ -228,10 +229,10 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 2.1 — Kanban Board | ✅ Done |
 | Phase 2.2 — Tasks (Checklist) | ✅ Done |
 | Phase 2.3 — Assignment & Deadlines | ✅ Done |
-| Phase 2.4 — Notifications | 🔄 Next |
+| Phase 2.4 — Notifications | ✅ Done |
 | Phase 2.5 — Search | ✅ Done (ILIKE, implemented in Phase 1.7/1.8) |
-| Phase 2.6 — Audit Log | 🔲 Planned |
-| Phase 3 — AI Layer | 🔲 Planned |
+| Phase 2.6 — Audit Log | ✅ Done |
+| Phase 3 — AI Layer | 🔲 Next |
 | Phase 4 — Integrations | 🔲 Planned |
 
 See `TODO.md` for full task-level breakdown.

@@ -22,6 +22,8 @@ A production-like system demonstrating how modern enterprise software is designe
 | **Assignment** | Assignee selector on create/edit modals; "Assigned to me" quick-filter; `GET /users/assignable` |
 | **Deadlines** | Due date picker; overdue detection (red highlight on list + detail + Kanban card); `?overdue=true` API filter |
 | **Search & filters** | Debounced full-text search on title+description; filter by status, priority, overdue |
+| **Notifications** | Slack `chat.postMessage` on ticket created/assigned/status-changed; SendGrid HTML email on assignment |
+| **Audit log** | Every ticket + task mutation recorded (`CREATED`, `UPDATED`, `STATUS_CHANGED`, `ASSIGNED`, `DELETED`); activity panel on ticket detail page |
 | **Authentication** | Auth0 JWT (RS256); auto-upsert user on login; RBAC (ADMIN / MANAGER / MEMBER) |
 | **Deployment** | Vercel (frontend) + Render (backend); GitHub Actions CI: lint → typecheck → build → deploy |
 
@@ -31,9 +33,9 @@ A production-like system demonstrating how modern enterprise software is designe
 
 - **Ticket & Task Management** — CRUD, Kanban board, status workflows with enforced transitions, assignments and deadlines
 - **AI-Assisted Automation** *(Phase 3)* — auto-categorization, priority scoring, ticket summarization via async queue processing
-- **Notifications** *(Phase 2.4)* — Slack webhooks, email via SendGrid on ticket events
+- **Notifications** — Slack webhooks + SendGrid email on ticket created/assigned/status-changed
 - **Authentication & Authorization** — JWT, Auth0, RBAC guards on all protected endpoints
-- **Audit Logging** *(Phase 2.6)* — full activity trail for enterprise compliance
+- **Audit Logging** — full activity trail (ticket + task mutations); `GET /logs`; activity panel in ticket detail
 - **Async Queue Processing** *(Phase 3)* — BullMQ + Redis decouples heavy AI jobs from request lifecycle
 
 ---
@@ -49,7 +51,8 @@ A production-like system demonstrating how modern enterprise software is designe
 ┌──────────────────────▼──────────────────────────────┐
 │               Backend (NestJS)                       │
 │   Auth │ Users │ Tickets │ Tasks   ← live            │
-│   Notifications │ AI │ Logs        ← planned         │
+│   Notifications │ Logs              ← live            │
+│   AI                                ← planned         │
 └──────┬───────────────────────────┬──────────────────┘
        │                           │
 ┌──────▼──────┐           ┌────────▼────────┐
@@ -178,10 +181,10 @@ ticket-task_manager/
 | Phase 2.1 — Kanban Board | ✅ Done | Drag-and-drop board with optimistic updates |
 | Phase 2.2 — Tasks | ✅ Done | Per-ticket task checklist with progress tracking |
 | Phase 2.3 — Assignment & Deadlines | ✅ Done | Assignee selector, overdue filters, due date indicators |
-| Phase 2.4 — Notifications | 🔄 Next | Slack webhooks + SendGrid email |
+| Phase 2.4 — Notifications | ✅ Done | Slack webhooks + SendGrid email |
 | Phase 2.5 — Search | ✅ Done | ILIKE search on title+description, debounced UI |
-| Phase 2.6 — Audit Log | 🔲 Planned | Activity trail, compliance logging |
-| Phase 3 — AI Layer | 🔲 Planned | BullMQ + Hugging Face auto-processing |
+| Phase 2.6 — Audit Log | ✅ Done | Activity trail, `GET /logs`, ticket detail activity panel |
+| Phase 3 — AI Layer | 🔲 Next | BullMQ + Hugging Face auto-processing |
 | Phase 4 — Integrations | 🔲 Planned | Google Calendar, File Uploads |
 | Enterprise Practices | 🔄 Ongoing | CI/CD, RBAC, Redis cache, Observability |
 

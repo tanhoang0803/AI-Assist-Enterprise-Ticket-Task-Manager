@@ -161,21 +161,21 @@
 - [x] Overdue due dates highlighted in red (list + detail pages)
 - [x] overdue/dueBefore/dueAfter query params on `GET /tickets`
 
-### 2.4 Notifications Module 🔄 Next
-- [ ] Backend: NotificationsModule with NotificationsService
-- [ ] Slack integration
-  - [ ] `SLACK_BOT_TOKEN` + `SLACK_CHANNEL_ID` env vars
-  - [ ] SlackService — `postMessage(channel, text, blocks?)`
-  - [ ] Trigger: ticket created (title, priority, reporter)
-  - [ ] Trigger: ticket assigned (assignee name, ticket title)
-  - [ ] Trigger: ticket status changed (old → new status)
-- [ ] Email integration
-  - [ ] `SENDGRID_API_KEY` + `SENDGRID_FROM_EMAIL` env vars
-  - [ ] EmailService — `sendTicketAssigned(to, ticket)`
-  - [ ] HTML email template: ticket assigned notification
-  - [ ] Trigger: assignment change (send to new assignee)
-- [ ] Wire triggers into TicketsService (call NotificationsService after create/update)
-- [ ] Graceful degradation — notification failures must not break ticket operations
+### 2.4 Notifications Module ✅
+- [x] Backend: NotificationsModule with NotificationsService
+- [x] Slack integration
+  - [x] `SLACK_BOT_TOKEN` + `SLACK_CHANNEL_ID` env vars
+  - [x] SlackService — `postMessage(text)` via native fetch; auto-disabled when env vars absent
+  - [x] Trigger: ticket created (title, priority, reporter)
+  - [x] Trigger: ticket assigned (assignee name, ticket title)
+  - [x] Trigger: ticket status changed (old → new status)
+- [x] Email integration
+  - [x] `SENDGRID_API_KEY` + `SENDGRID_FROM_EMAIL` env vars
+  - [x] EmailService — `sendTicketAssigned(to, ticket)` via SendGrid v3 REST API; auto-disabled when env vars absent
+  - [x] HTML email template: ticket assigned notification
+  - [x] Trigger: assignment change (send to new assignee)
+- [x] Wire triggers into TicketsService (fire-and-forget void calls after create/update)
+- [x] Graceful degradation — notification failures caught and logged, never propagate
 
 ### 2.5 Search ✅
 - [x] `GET /tickets?search=...` query param (ILIKE on title + description — implemented in Phase 1.7)
@@ -183,15 +183,15 @@
 - [x] Debounced search hook (`useDebounce` — implemented in Phase 1.2)
 - [ ] PostgreSQL full-text search upgrade (tsvector/tsquery + GIN index — optional optimization)
 
-### 2.6 Audit Log
-- [ ] Backend: LogsModule with LogsService
-- [ ] AuditLog Prisma model already defined — no migration needed
-- [ ] LogsService — `log(action, entityType, entityId, userId, metadata?)`
-- [ ] Wire into TicketsService: log CREATED, UPDATED, STATUS_CHANGED, ASSIGNED, DELETED
-- [ ] Wire into TasksService: log CREATED, UPDATED, DELETED
-- [ ] `GET /logs` — paginated activity log (ADMIN only, filter by entityType/entityId)
-- [ ] Activity log panel in frontend (ticket detail page sidebar)
-- [ ] Format log entries with actor name, action label, timestamp
+### 2.6 Audit Log ✅
+- [x] Backend: LogsModule (@Global) with LogsService
+- [x] AuditLog Prisma model already defined — no migration needed
+- [x] LogsService — `log(action, entityType, entityId, userId, metadata?)` (fire-and-forget)
+- [x] Wire into TicketsService: log CREATED, UPDATED, STATUS_CHANGED, ASSIGNED, DELETED
+- [x] Wire into TasksService: log CREATED, UPDATED, DELETED (userId threaded via @CurrentUser())
+- [x] `GET /logs` — paginated, JWT-protected, filter by entityType + entityId
+- [x] ActivityLog component in frontend (ticket detail page sidebar)
+- [x] Format log entries with actor avatar/initial, action label, timeAgo timestamp
 
 ---
 
@@ -307,12 +307,10 @@
 
 ## Current Focus
 
-**Phase 2 — Core Product Features**
+**Phase 3 — AI-Assist Layer**
 
-Complete: Phases 0, 1.1–1.9, 2.1 (Kanban), 2.2 (Tasks), 2.3 (Assignment & Deadlines), 2.5 (Search).  
-**Next up: Phase 2.4 — Notifications**, then Phase 2.6 — Audit Log.
-
-After Phase 2 is fully done, move to Phase 3 (AI Layer: BullMQ + Hugging Face).
+Complete: Phases 0, 1.1–1.9, 2.1 (Kanban), 2.2 (Tasks), 2.3 (Assignment & Deadlines), 2.4 (Notifications), 2.5 (Search), 2.6 (Audit Log).  
+**Phase 2 is fully complete. Next up: Phase 3 — AI Layer (BullMQ + Redis + Hugging Face).**
 
 > **Manual steps still required before going live:**
 > - Auth0 tenant setup (see `docs/auth0-setup.md`) — fill `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` in `.env.local`
