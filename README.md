@@ -45,33 +45,23 @@ A production-like system demonstrating how modern enterprise software is designe
 │                    Frontend (Next.js)                │
 │          App Router · TypeScript · TailwindCSS       │
 └──────────────────────┬──────────────────────────────┘
-                       │ REST / tRPC
+                       │ REST (axios + React Query)
 ┌──────────────────────▼──────────────────────────────┐
 │               Backend (NestJS)                       │
-│   Auth │ Users │ Tickets │ Tasks │ Notifications    │
-│   AI Module │ Workflow │ Audit Logs                  │
+│   Auth │ Users │ Tickets │ Tasks   ← live            │
+│   Notifications │ AI │ Logs        ← planned         │
 └──────┬───────────────────────────┬──────────────────┘
        │                           │
 ┌──────▼──────┐           ┌────────▼────────┐
 │ PostgreSQL  │           │  Redis + BullMQ  │
-│  (Supabase) │           │  (Async Queue)   │
+│  (Supabase) │           │  (Phase 3)       │
 └─────────────┘           └────────┬─────────┘
                                    │
                           ┌────────▼─────────┐
                           │   AI Layer        │
                           │ Hugging Face /    │
-                          │ OpenAI            │
+                          │ OpenAI (Phase 3)  │
                           └──────────────────┘
-```
-
----
-
-## AI Processing Flow
-
-```
-User creates ticket → NestJS → BullMQ Queue → AI Processor
-   → Auto-categorize → Score priority → Summarize
-   → Update DB → Trigger Slack/Email notification
 ```
 
 ---
@@ -127,12 +117,22 @@ pnpm db:seed
 pnpm dev
 ```
 
+**Local dev services:**
+
 | Service | URL |
 |---|---|
 | Frontend (Next.js) | `http://localhost:3000` |
 | API (NestJS) | `http://localhost:4000` |
 | Swagger UI | `http://localhost:4000/api/docs` |
 | Prisma Studio | `http://localhost:5555` |
+
+**Deployed (production):**
+
+| Service | Platform |
+|---|---|
+| Frontend | Vercel — auto-deploys on push to `main` |
+| Backend | Render — deploys via GitHub Actions deploy hook |
+| Database | Supabase PostgreSQL (pooler + direct URL) |
 
 > **Note:** Docker maps Postgres to port `5434` and Redis to port `6380` to avoid conflicts with local installations. The `.env.local` `DATABASE_URL` must use port `5434`.
 
@@ -179,7 +179,7 @@ ticket-task_manager/
 | Phase 2.2 — Tasks | ✅ Done | Per-ticket task checklist with progress tracking |
 | Phase 2.3 — Assignment & Deadlines | ✅ Done | Assignee selector, overdue filters, due date indicators |
 | Phase 2.4 — Notifications | 🔄 Next | Slack webhooks + SendGrid email |
-| Phase 2.5 — Search | 🔲 Planned | Full-text search across tickets |
+| Phase 2.5 — Search | ✅ Done | ILIKE search on title+description, debounced UI |
 | Phase 2.6 — Audit Log | 🔲 Planned | Activity trail, compliance logging |
 | Phase 3 — AI Layer | 🔲 Planned | BullMQ + Hugging Face auto-processing |
 | Phase 4 — Integrations | 🔲 Planned | Google Calendar, File Uploads |

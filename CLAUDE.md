@@ -14,18 +14,29 @@
 ```
 ticket-task_manager/
 ├── apps/
-│   ├── web/          # Next.js 14 · TypeScript · TailwindCSS · App Router
-│   └── api/          # NestJS · TypeScript · Prisma · BullMQ
+│   ├── web/                    # Next.js 14 · TypeScript · TailwindCSS · App Router
+│   │   ├── app/(protected)/    # Auth-guarded pages: dashboard (Kanban), tickets, tickets/[id]
+│   │   ├── features/tickets/   # Components, hooks (useTickets, useTasks, useKanban, useUsers)
+│   │   └── services/           # API wrappers: tickets.ts, tasks.ts, users.ts, api.ts
+│   └── api/                    # NestJS · TypeScript · Prisma (BullMQ — Phase 3)
+│       ├── prisma/             # schema.prisma, migrations, seed.ts
+│       └── src/
+│           ├── modules/        # auth, users, tickets, tasks, health
+│           ├── common/         # guards, decorators, interceptors, filters
+│           ├── config/         # configuration.ts, Joi validation schema
+│           └── database/       # PrismaModule, PrismaService
 ├── packages/
-│   ├── ui/           # Shared React components
-│   ├── types/        # Shared TypeScript types & enums
-│   ├── utils/        # Shared helper functions
-│   └── config/       # Shared eslint / tsconfig
+│   ├── ui/           # Shared React components (Modal, Badge, Button, Card, Input)
+│   ├── types/        # Shared TypeScript types & enums (Ticket, Task, User, enums)
+│   ├── utils/        # cn, formatDate, formatDateTime, isOverdue, timeAgo
+│   └── config/       # Shared eslint / tsconfig presets
 ├── infrastructure/
-│   ├── docker/       # docker-compose, Dockerfiles
-│   ├── ci-cd/        # GitHub Actions workflows
+│   ├── docker/       # docker-compose.yml, Dockerfile
 │   └── k8s/          # Optional Kubernetes manifests
-├── docs/             # Architecture, API flow, AI flow, roadmap
+├── docs/             # architecture.md, api-flow.md, ai-flow.md, auth0-setup.md, roadmap.md
+├── .github/workflows/# ci.yml — lint → typecheck → build → deploy
+├── render.yaml       # Render web service config
+├── start.sh          # Render startup: prisma migrate deploy + node dist/main
 ├── .claude/          # AI development system (agents, skills, commands, hooks, memory)
 └── scripts/          # Dev & ops utility scripts
 ```
@@ -65,7 +76,29 @@ ticket-task_manager/
 
 ---
 
-## AI Processing Flow
+## Live API Endpoints (quick reference)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/health` | — | Health check |
+| GET | `/api/auth/profile` | JWT | Current user from DB |
+| GET | `/api/users/me` | JWT | Own profile |
+| GET | `/api/users/assignable` | JWT | id+name+avatar list for dropdowns |
+| GET | `/api/users` | ADMIN | All users |
+| PATCH | `/api/users/:id` | JWT | Update own profile (ADMIN: any) |
+| GET | `/api/tickets` | JWT | List with filters + pagination |
+| POST | `/api/tickets` | JWT | Create ticket |
+| GET | `/api/tickets/:id` | JWT | Ticket detail |
+| PATCH | `/api/tickets/:id` | JWT | Update (reporter/assignee/ADMIN/MANAGER) |
+| DELETE | `/api/tickets/:id` | ADMIN/MANAGER | Soft delete |
+| GET | `/api/tickets/:id/tasks` | JWT | Task list for ticket |
+| POST | `/api/tickets/:id/tasks` | JWT | Create task |
+| PATCH | `/api/tasks/:id` | JWT | Update task title/status |
+| DELETE | `/api/tasks/:id` | JWT | Delete task |
+
+---
+
+## AI Processing Flow *(Phase 3 — planned)*
 
 ```
 User creates ticket
@@ -196,7 +229,7 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 2.2 — Tasks (Checklist) | ✅ Done |
 | Phase 2.3 — Assignment & Deadlines | ✅ Done |
 | Phase 2.4 — Notifications | 🔄 Next |
-| Phase 2.5 — Search | 🔲 Planned |
+| Phase 2.5 — Search | ✅ Done (ILIKE, implemented in Phase 1.7/1.8) |
 | Phase 2.6 — Audit Log | 🔲 Planned |
 | Phase 3 — AI Layer | 🔲 Planned |
 | Phase 4 — Integrations | 🔲 Planned |

@@ -161,15 +161,21 @@
 - [x] Overdue due dates highlighted in red (list + detail pages)
 - [x] overdue/dueBefore/dueAfter query params on `GET /tickets`
 
-### 2.4 Notifications Module
+### 2.4 Notifications Module 🔄 Next
+- [ ] Backend: NotificationsModule with NotificationsService
 - [ ] Slack integration
-  - [ ] Configure Slack App + Bot token
-  - [ ] Slack service (post message to channel)
-  - [ ] Trigger on: ticket created, assigned, status changed
+  - [ ] `SLACK_BOT_TOKEN` + `SLACK_CHANNEL_ID` env vars
+  - [ ] SlackService — `postMessage(channel, text, blocks?)`
+  - [ ] Trigger: ticket created (title, priority, reporter)
+  - [ ] Trigger: ticket assigned (assignee name, ticket title)
+  - [ ] Trigger: ticket status changed (old → new status)
 - [ ] Email integration
-  - [ ] SendGrid account + API key
-  - [ ] Email templates (ticket created, assigned)
-  - [ ] Trigger on: assignment
+  - [ ] `SENDGRID_API_KEY` + `SENDGRID_FROM_EMAIL` env vars
+  - [ ] EmailService — `sendTicketAssigned(to, ticket)`
+  - [ ] HTML email template: ticket assigned notification
+  - [ ] Trigger: assignment change (send to new assignee)
+- [ ] Wire triggers into TicketsService (call NotificationsService after create/update)
+- [ ] Graceful degradation — notification failures must not break ticket operations
 
 ### 2.5 Search ✅
 - [x] `GET /tickets?search=...` query param (ILIKE on title + description — implemented in Phase 1.7)
@@ -178,11 +184,14 @@
 - [ ] PostgreSQL full-text search upgrade (tsvector/tsquery + GIN index — optional optimization)
 
 ### 2.6 Audit Log
-- [ ] AuditLog module (backend)
-- [ ] Interceptor to auto-log mutations
-- [ ] `GET /logs` — paginated activity log (ADMIN)
-- [ ] Activity log panel in frontend (ticket detail)
-- [ ] Log entries: created, updated, assigned, status changed, deleted
+- [ ] Backend: LogsModule with LogsService
+- [ ] AuditLog Prisma model already defined — no migration needed
+- [ ] LogsService — `log(action, entityType, entityId, userId, metadata?)`
+- [ ] Wire into TicketsService: log CREATED, UPDATED, STATUS_CHANGED, ASSIGNED, DELETED
+- [ ] Wire into TasksService: log CREATED, UPDATED, DELETED
+- [ ] `GET /logs` — paginated activity log (ADMIN only, filter by entityType/entityId)
+- [ ] Activity log panel in frontend (ticket detail page sidebar)
+- [ ] Format log entries with actor name, action label, timestamp
 
 ---
 
@@ -287,8 +296,12 @@
 - [x] `docs/architecture.md` — system design overview
 - [x] `docs/api-flow.md` — REST API endpoint map
 - [x] `docs/ai-flow.md` — AI queue pipeline deep-dive
+- [x] `docs/auth0-setup.md` — step-by-step Auth0 tenant + API setup guide
 - [x] `docs/roadmap.md` — future features backlog
+- [x] `CLAUDE.md` — AI dev instructions + live API endpoint quick reference
+- [x] `README.md` — live features table, architecture, setup, roadmap
 - [x] Swagger/OpenAPI auto-generated from NestJS decorators (at `/api/docs` in dev)
+- [ ] Update `docs/api-flow.md` to include tasks, assignable, overdue filter endpoints
 
 ---
 
@@ -296,13 +309,15 @@
 
 **Phase 2 — Core Product Features**
 
-Phases 0, 1.1–1.9, 2.1, 2.2, and 2.3 are complete. Next: Phase 2.4 Notifications, Phase 2.5 Search, Phase 2.6 Audit Log.
+Complete: Phases 0, 1.1–1.9, 2.1 (Kanban), 2.2 (Tasks), 2.3 (Assignment & Deadlines), 2.5 (Search).  
+**Next up: Phase 2.4 — Notifications**, then Phase 2.6 — Audit Log.
 
-> Manual steps still required before going live:
-> - Auth0 tenant setup (see `docs/auth0-setup.md`)
+After Phase 2 is fully done, move to Phase 3 (AI Layer: BullMQ + Hugging Face).
+
+> **Manual steps still required before going live:**
+> - Auth0 tenant setup (see `docs/auth0-setup.md`) — fill `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` in `.env.local`
 > - Set `RENDER_DEPLOY_HOOK_URL` in GitHub repo secrets
-> - Set `DATABASE_URL`, `AUTH0_*` in Render dashboard env vars
-> - Set `SLACK_BOT_TOKEN` in Render dashboard for Phase 2.4
-> - Set `SENDGRID_API_KEY` in Render dashboard for Phase 2.4
-
-> Auth0 manual setup still required — see `docs/auth0-setup.md` and fill in `AUTH0_*` values in `.env.local` before testing protected endpoints.
+> - Set `DATABASE_URL`, `DIRECT_URL`, `AUTH0_*` in Render dashboard env vars
+> - Set `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID` in Render dashboard for Phase 2.4
+> - Set `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL` in Render dashboard for Phase 2.4
+> - Set `HUGGINGFACE_API_KEY` in Render dashboard for Phase 3
