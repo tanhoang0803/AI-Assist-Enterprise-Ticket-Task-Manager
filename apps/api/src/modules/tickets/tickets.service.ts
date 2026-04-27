@@ -10,6 +10,7 @@ import type { AuthUser } from '@common/decorators/current-user.decorator';
 import type { CreateTicketDto } from './dto/create-ticket.dto';
 import type { UpdateTicketDto } from './dto/update-ticket.dto';
 import type { TicketQueryDto } from './dto/ticket-query.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const VALID_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
   [TicketStatus.OPEN]: [TicketStatus.IN_PROGRESS],
@@ -41,10 +42,13 @@ const ticketSelect = {
 
 @Injectable()
 export class TicketsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
-  create(dto: CreateTicketDto, reporter: AuthUser) {
-    return this.prisma.ticket.create({
+  async create(dto: CreateTicketDto, reporter: AuthUser) {
+    const ticket = await this.prisma.ticket.create({
       data: {
         title: dto.title,
         description: dto.description,
@@ -56,6 +60,13 @@ export class TicketsService {
       },
       select: ticketSelect,
     });
+
+    void this.notifications.onTicketCreated(ticket);
+    if (ticket.assigneeId) {
+      void this.notifications.onTicketAssigned(ticket, null);
+    }
+
+    return ticket;
   }
 
   async findAll(query: TicketQueryDto) {
@@ -152,7 +163,10 @@ export class TicketsService {
       }
     }
 
-    return this.prisma.ticket.update({
+    const previousAssigneeId = ticket.assigneeId;
+    const previousStatus = ticket.status;
+
+    const updated = await this.prisma.ticket.update({
       where: { id },
       data: {
         ...(dto.title !== undefined && { title: dto.title }),
@@ -167,6 +181,15 @@ export class TicketsService {
       },
       select: ticketSelect,
     });
+
+    if (dto.assigneeId !== undefined) {
+      void this.notifications.onTicketAssigned(updated, previousAssigneeId);
+    }
+    if (dto.status !== undefined && dto.status !== (previousStatus as unknown as TicketStatus)) {
+      void this.notifications.onTicketStatusChanged(updated, previousStatus);
+    }
+
+    return updated;
   }
 
   async remove(id: string) {
