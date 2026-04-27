@@ -11,6 +11,7 @@ import type { CreateTicketDto } from './dto/create-ticket.dto';
 import type { UpdateTicketDto } from './dto/update-ticket.dto';
 import type { TicketQueryDto } from './dto/ticket-query.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { LogsService, AuditAction } from '../logs/logs.service';
 
 const VALID_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
   [TicketStatus.OPEN]: [TicketStatus.IN_PROGRESS],
@@ -45,6 +46,7 @@ export class TicketsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
+    private readonly logs: LogsService,
   ) {}
 
   async create(dto: CreateTicketDto, reporter: AuthUser) {
@@ -64,6 +66,23 @@ export class TicketsService {
     void this.notifications.onTicketCreated(ticket);
     if (ticket.assigneeId) {
       void this.notifications.onTicketAssigned(ticket, null);
+    }
+
+    this.logs.log({
+      action: AuditAction.CREATED,
+      entityType: 'TICKET',
+      entityId: ticket.id,
+      userId: reporter.id,
+      metadata: { title: ticket.title, priority: ticket.priority },
+    });
+    if (ticket.assigneeId) {
+      this.logs.log({
+        action: AuditAction.ASSIGNED,
+        entityType: 'TICKET',
+        entityId: ticket.id,
+        userId: reporter.id,
+        metadata: { assigneeId: ticket.assigneeId },
+      });
     }
 
     return ticket;
@@ -182,26 +201,60 @@ export class TicketsService {
       select: ticketSelect,
     });
 
-    if (dto.assigneeId !== undefined) {
-      void this.notifications.onTicketAssigned(updated, previousAssigneeId);
+    const changedFields = Object.keys(dto).filter((k) => (dto as Record<string, unknown>)[k] !== undefined);
+    if (changedFields.length > 0) {
+      this.logs.log({
+        action: AuditAction.UPDATED,
+        entityType: 'TICKET',
+        entityId: updated.id,
+        userId: requester.id,
+        metadata: { fields: changedFields },
+      });
     }
+
+    if (dto.assigneeId !== undefined && updated.assigneeId !== previousAssigneeId) {
+      void this.notifications.onTicketAssigned(updated, previousAssigneeId);
+      this.logs.log({
+        action: AuditAction.ASSIGNED,
+        entityType: 'TICKET',
+        entityId: updated.id,
+        userId: requester.id,
+        metadata: { assigneeId: updated.assigneeId },
+      });
+    }
+
     if (dto.status !== undefined && dto.status !== (previousStatus as unknown as TicketStatus)) {
       void this.notifications.onTicketStatusChanged(updated, previousStatus);
+      this.logs.log({
+        action: AuditAction.STATUS_CHANGED,
+        entityType: 'TICKET',
+        entityId: updated.id,
+        userId: requester.id,
+        metadata: { from: previousStatus, to: updated.status },
+      });
     }
 
     return updated;
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
     const ticket = await this.prisma.ticket.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true },
+      select: { id: true, title: true },
     });
     if (!ticket) throw new NotFoundException(`Ticket ${id} not found`);
 
     await this.prisma.ticket.update({
       where: { id },
       data: { deletedAt: new Date() },
+    });
+
+    this.logs.log({
+      action: AuditAction.DELETED,
+      entityType: 'TICKET',
+      entityId: id,
+      userId,
+      metadata: { title: ticket.title },
     });
   }
 }

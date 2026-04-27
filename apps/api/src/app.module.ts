@@ -9,6 +9,7 @@ import { UsersModule } from './modules/users/users.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { LogsModule } from './modules/logs/logs.module';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     TicketsModule,
     TasksModule,
     NotificationsModule,
-    // Phase 2.6 — LogsModule
+    LogsModule,
     // Phase 3.1 — QueueModule
     // Phase 3.2 — AiModule
   ],

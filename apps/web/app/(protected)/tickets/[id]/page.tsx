@@ -9,6 +9,7 @@ import { TicketStatusBadge } from '@/features/tickets/components/TicketStatusBad
 import { TicketPriorityBadge } from '@/features/tickets/components/TicketPriorityBadge';
 import { EditTicketModal } from '@/features/tickets/components/EditTicketModal';
 import { TaskChecklist } from '@/features/tickets/components/TaskChecklist';
+import { ActivityLog } from '@/features/tickets/components/ActivityLog';
 
 interface Props {
   params: { id: string };
@@ -107,7 +108,7 @@ export default function TicketDetailPage({ params }: Props) {
         </div>
 
         {/* Details sidebar */}
-        <div>
+        <div className="space-y-5">
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">Details</h2>
             <dl className="space-y-4 text-sm">
@@ -194,6 +195,12 @@ export default function TicketDetailPage({ params }: Props) {
                 <dd className="mt-1 text-gray-500">{formatDateTime(ticket.updatedAt)}</dd>
               </div>
             </dl>
+          </div>
+
+          {/* Activity log */}
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-gray-700">Activity</h2>
+            <ActivityLog ticketId={ticket.id} />
           </div>
         </div>
       </div>

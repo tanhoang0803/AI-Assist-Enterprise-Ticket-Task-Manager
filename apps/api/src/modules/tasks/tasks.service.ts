@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
+import { LogsService, AuditAction } from '../logs/logs.service';
 import type { CreateTaskDto } from './dto/create-task.dto';
 import type { UpdateTaskDto } from './dto/update-task.dto';
 
@@ -16,7 +17,10 @@ const taskSelect = {
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logs: LogsService,
+  ) {}
 
   async findByTicket(ticketId: string) {
     const ticket = await this.prisma.ticket.findFirst({
@@ -32,14 +36,14 @@ export class TasksService {
     });
   }
 
-  async create(ticketId: string, dto: CreateTaskDto) {
+  async create(ticketId: string, dto: CreateTaskDto, userId: string) {
     const ticket = await this.prisma.ticket.findFirst({
       where: { id: ticketId, deletedAt: null },
       select: { id: true },
     });
     if (!ticket) throw new NotFoundException(`Ticket ${ticketId} not found`);
 
-    return this.prisma.task.create({
+    const task = await this.prisma.task.create({
       data: {
         title: dto.title,
         ticketId,
@@ -47,13 +51,23 @@ export class TasksService {
       },
       select: taskSelect,
     });
+
+    this.logs.log({
+      action: AuditAction.CREATED,
+      entityType: 'TASK',
+      entityId: task.id,
+      userId,
+      metadata: { title: task.title, ticketId },
+    });
+
+    return task;
   }
 
-  async update(id: string, dto: UpdateTaskDto) {
+  async update(id: string, dto: UpdateTaskDto, userId: string) {
     const task = await this.prisma.task.findUnique({ where: { id }, select: { id: true } });
     if (!task) throw new NotFoundException(`Task ${id} not found`);
 
-    return this.prisma.task.update({
+    const updated = await this.prisma.task.update({
       where: { id },
       data: {
         ...(dto.title !== undefined && { title: dto.title }),
@@ -62,11 +76,36 @@ export class TasksService {
       },
       select: taskSelect,
     });
+
+    const changedFields = Object.keys(dto).filter((k) => (dto as Record<string, unknown>)[k] !== undefined);
+    if (changedFields.length > 0) {
+      this.logs.log({
+        action: AuditAction.UPDATED,
+        entityType: 'TASK',
+        entityId: id,
+        userId,
+        metadata: { fields: changedFields },
+      });
+    }
+
+    return updated;
   }
 
-  async remove(id: string) {
-    const task = await this.prisma.task.findUnique({ where: { id }, select: { id: true } });
+  async remove(id: string, userId: string) {
+    const task = await this.prisma.task.findUnique({
+      where: { id },
+      select: { id: true, title: true, ticketId: true },
+    });
     if (!task) throw new NotFoundException(`Task ${id} not found`);
+
     await this.prisma.task.delete({ where: { id } });
+
+    this.logs.log({
+      action: AuditAction.DELETED,
+      entityType: 'TASK',
+      entityId: id,
+      userId,
+      metadata: { title: task.title, ticketId: task.ticketId },
+    });
   }
 }

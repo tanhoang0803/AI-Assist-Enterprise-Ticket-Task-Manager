@@ -62,7 +62,7 @@ export class TicketsController {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete ticket (ADMIN/MANAGER only)' })
-  remove(@Param('id') id: string) {
-    return this.ticketsService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.ticketsService.remove(id, user.id);
   }
 }
