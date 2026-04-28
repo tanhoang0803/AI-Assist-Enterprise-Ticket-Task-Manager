@@ -1,5 +1,7 @@
 import 'reflect-metadata';
+import { join } from 'node:path';
 import { NestFactory, Reflector } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -12,9 +14,12 @@ import { RolesGuard } from './common/guards/roles.guard';
 
 async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
   const config = app.get(ConfigService);
   const reflector = app.get(Reflector);
+
+  // Serve uploaded files
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
 
   // Security
   app.use(helmet());

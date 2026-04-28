@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Pencil, Cpu } from 'lucide-react';
+import { ChevronRight, Pencil, Cpu, Calendar } from 'lucide-react';
 import { formatDate, formatDateTime, isOverdue } from '@repo/utils';
 import { useTicket, useAnalyzeTicket } from '@/features/tickets/hooks/useTickets';
+import { useMutation } from '@tanstack/react-query';
+import { apiClient } from '@/services/api';
 import { TicketStatusBadge } from '@/features/tickets/components/TicketStatusBadge';
 import { TicketPriorityBadge } from '@/features/tickets/components/TicketPriorityBadge';
 import { EditTicketModal } from '@/features/tickets/components/EditTicketModal';
 import { TaskChecklist } from '@/features/tickets/components/TaskChecklist';
 import { ActivityLog } from '@/features/tickets/components/ActivityLog';
+import { AttachmentPanel } from '@/features/tickets/components/AttachmentPanel';
 
 interface Props {
   params: { id: string };
@@ -18,6 +21,10 @@ interface Props {
 export default function TicketDetailPage({ params }: Props) {
   const { data: ticket, isLoading, isError } = useTicket(params.id);
   const { mutate: analyzeTicket, isPending: isAnalyzing } = useAnalyzeTicket();
+  const { mutate: syncCalendar, isPending: isSyncing, isSuccess: isSynced } = useMutation({
+    mutationFn: (ticketId: string) =>
+      apiClient.post(`/google/tickets/${ticketId}/calendar-sync`),
+  });
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   if (isLoading) {
@@ -80,6 +87,11 @@ export default function TicketDetailPage({ params }: Props) {
           {/* Tasks */}
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <TaskChecklist ticketId={ticket.id} />
+          </div>
+
+          {/* Attachments */}
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <AttachmentPanel ticketId={ticket.id} />
           </div>
 
           {/* AI Analysis */}
@@ -197,6 +209,19 @@ export default function TicketDetailPage({ params }: Props) {
                         </span>
                       )}
                   </dd>
+                </div>
+              )}
+
+              {ticket.dueDate && ticket.assigneeId && (
+                <div>
+                  <button
+                    onClick={() => syncCalendar(ticket.id)}
+                    disabled={isSyncing}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+                  >
+                    <Calendar className="h-3.5 w-3.5" />
+                    {isSyncing ? 'Syncing...' : isSynced ? 'Synced ✓' : 'Sync to Calendar'}
+                  </button>
                 </div>
               )}
 

@@ -12,6 +12,8 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { LogsModule } from './modules/logs/logs.module';
 import { QueueModule } from './queue/queue.module';
 import { AiModule } from './modules/ai/ai.module';
+import { AttachmentsModule } from './modules/attachments/attachments.module';
+import { GoogleModule } from './modules/google/google.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { AiModule } from './modules/ai/ai.module';
     LogsModule,
     QueueModule,
     AiModule,
+    AttachmentsModule,
+    GoogleModule,
   ],
 })
 export class AppModule {}

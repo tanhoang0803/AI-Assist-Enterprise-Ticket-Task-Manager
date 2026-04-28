@@ -17,6 +17,10 @@ export const configValidationSchema = Joi.object({
   HUGGINGFACE_API_KEY: Joi.string().optional(),
   OPENAI_API_KEY: Joi.string().optional(),
 
+  GOOGLE_CLIENT_ID: Joi.string().optional(),
+  GOOGLE_CLIENT_SECRET: Joi.string().optional(),
+  GOOGLE_REDIRECT_URI: Joi.string().optional().default('http://localhost:4000/api/google/callback'),
+
   SLACK_BOT_TOKEN: Joi.string().optional(),
   SLACK_CHANNEL_ID: Joi.string().optional(),
   SENDGRID_API_KEY: Joi.string().optional(),
@@ -33,6 +37,7 @@ export interface AppConfig {
   openai: { apiKey?: string };
   slack: { botToken?: string; channelId?: string };
   sendgrid: { apiKey?: string; fromEmail?: string };
+  google: { clientId?: string; clientSecret?: string; redirectUri: string };
 }
 
 export default (): AppConfig => ({
@@ -57,5 +62,10 @@ export default (): AppConfig => ({
   sendgrid: {
     apiKey: process.env.SENDGRID_API_KEY,
     fromEmail: process.env.SENDGRID_FROM_EMAIL,
+  },
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    redirectUri: process.env.GOOGLE_REDIRECT_URI ?? 'http://localhost:4000/api/google/callback',
   },
 });

@@ -70,7 +70,8 @@ model User {
   name      String
   avatarUrl String?
   role      UserRole @default(MEMBER)
-  auth0Id   String?  @unique
+  auth0Id            String?  @unique
+  googleRefreshToken String?
 
   reportedTickets  Ticket[]   @relation("ReporterTickets")
   assignedTickets  Ticket[]   @relation("AssigneeTickets")
@@ -105,6 +106,9 @@ model Ticket {
   aiPriority    String?
   aiSummary     String?   @db.Text
   aiProcessedAt DateTime?
+
+  // Google Calendar sync (Phase 4)
+  calendarEventId String?
 
   tasks       Task[]
   attachments Attachment[]
