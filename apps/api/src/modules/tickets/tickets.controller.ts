@@ -8,9 +8,13 @@ import {
   Body,
   Query,
   UseGuards,
+  UseInterceptors,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL, CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
@@ -27,21 +31,30 @@ import { TicketQueryDto } from './dto/ticket-query.dto';
 @UseGuards(JwtAuthGuard)
 @Controller('tickets')
 export class TicketsController {
-  constructor(private readonly ticketsService: TicketsService) {}
+  constructor(
+    private readonly ticketsService: TicketsService,
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a ticket' })
-  create(@Body() dto: CreateTicketDto, @CurrentUser() user: AuthUser) {
-    return this.ticketsService.create(dto, user);
+  async create(@Body() dto: CreateTicketDto, @CurrentUser() user: AuthUser) {
+    const result = await this.ticketsService.create(dto, user);
+    await this.cache.clear();
+    return result;
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30_000)
   @ApiOperation({ summary: 'List tickets with filters and pagination' })
   findAll(@Query() query: TicketQueryDto) {
     return this.ticketsService.findAll(query);
   }
 
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30_000)
   @ApiOperation({ summary: 'Get ticket by ID' })
   findOne(@Param('id') id: string) {
     return this.ticketsService.findOne(id);
@@ -49,12 +62,14 @@ export class TicketsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update ticket — status transitions validated server-side' })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() dto: UpdateTicketDto,
     @CurrentUser() user: AuthUser,
   ) {
-    return this.ticketsService.update(id, dto, user);
+    const result = await this.ticketsService.update(id, dto, user);
+    await this.cache.clear();
+    return result;
   }
 
   @Delete(':id')
@@ -62,7 +77,8 @@ export class TicketsController {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete ticket (ADMIN/MANAGER only)' })
-  remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    return this.ticketsService.remove(id, user.id);
+  async remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    await this.ticketsService.remove(id, user.id);
+    await this.cache.clear();
   }
 }
