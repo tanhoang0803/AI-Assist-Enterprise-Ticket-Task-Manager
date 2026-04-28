@@ -10,6 +10,8 @@ import { TicketsModule } from './modules/tickets/tickets.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { LogsModule } from './modules/logs/logs.module';
+import { QueueModule } from './queue/queue.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -29,8 +31,8 @@ import { LogsModule } from './modules/logs/logs.module';
     TasksModule,
     NotificationsModule,
     LogsModule,
-    // Phase 3.1 — QueueModule
-    // Phase 3.2 — AiModule
+    QueueModule,
+    AiModule,
   ],
 })
 export class AppModule {}

@@ -7,6 +7,7 @@ import {
   type CreateTicketInput,
   type UpdateTicketInput,
 } from '@/services/tickets';
+import { aiService } from '@/services/ai';
 
 const TICKETS_KEY = 'tickets';
 
@@ -22,6 +23,21 @@ export function useTicket(id: string) {
     queryKey: [TICKETS_KEY, id],
     queryFn: () => ticketsService.getById(id),
     enabled: !!id,
+    // Poll every 8s while AI analysis is pending (no aiProcessedAt yet)
+    refetchInterval: (query) => {
+      const ticket = query.state.data;
+      return ticket && !ticket.aiProcessedAt ? 8_000 : false;
+    },
+  });
+}
+
+export function useAnalyzeTicket() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (ticketId: string) => aiService.analyzeTicket(ticketId),
+    onSuccess: (_, ticketId) => {
+      void qc.invalidateQueries({ queryKey: [TICKETS_KEY, ticketId] });
+    },
   });
 }
 

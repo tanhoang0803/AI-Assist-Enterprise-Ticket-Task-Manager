@@ -61,4 +61,13 @@ export class NotificationsService {
       `*Status:* ${oldStatus} → ${ticket.status}`;
     await this.slack.postMessage(text);
   }
+
+  async onAiProcessed(_ticketId: string, ticketTitle: string, aiCategory: string | null, aiPriority: string | null): Promise<void> {
+    const text =
+      `*AI analysis complete* :robot_face:\n` +
+      `*Ticket:* ${ticketTitle}\n` +
+      `*Suggested category:* ${aiCategory ?? 'n/a'}\n` +
+      `*Suggested priority:* ${aiPriority ?? 'n/a'}`;
+    await this.slack.postMessage(text);
+  }
 }

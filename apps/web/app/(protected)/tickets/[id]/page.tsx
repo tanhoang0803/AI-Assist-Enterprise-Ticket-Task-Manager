@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Pencil, Cpu } from 'lucide-react';
 import { formatDate, formatDateTime, isOverdue } from '@repo/utils';
-import { useTicket } from '@/features/tickets/hooks/useTickets';
+import { useTicket, useAnalyzeTicket } from '@/features/tickets/hooks/useTickets';
 import { TicketStatusBadge } from '@/features/tickets/components/TicketStatusBadge';
 import { TicketPriorityBadge } from '@/features/tickets/components/TicketPriorityBadge';
 import { EditTicketModal } from '@/features/tickets/components/EditTicketModal';
@@ -17,6 +17,7 @@ interface Props {
 
 export default function TicketDetailPage({ params }: Props) {
   const { data: ticket, isLoading, isError } = useTicket(params.id);
+  const { mutate: analyzeTicket, isPending: isAnalyzing } = useAnalyzeTicket();
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   if (isLoading) {
@@ -83,26 +84,43 @@ export default function TicketDetailPage({ params }: Props) {
 
           {/* AI Analysis */}
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Cpu className="h-4 w-4 text-purple-500" />
-              <h2 className="text-sm font-semibold text-gray-700">AI Analysis</h2>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Cpu className="h-4 w-4 text-purple-500" />
+                <h2 className="text-sm font-semibold text-gray-700">AI Analysis</h2>
+              </div>
+              <button
+                onClick={() => analyzeTicket(ticket.id)}
+                disabled={isAnalyzing}
+                className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-50 disabled:opacity-40"
+              >
+                {isAnalyzing ? 'Queuing...' : 'Re-analyze'}
+              </button>
             </div>
-            {ticket.aiSummary ? (
-              <div className="mt-3 space-y-2 text-sm text-gray-600">
-                <p>{ticket.aiSummary}</p>
-                {ticket.aiCategory && (
-                  <p className="text-xs text-gray-400">Suggested category: {ticket.aiCategory}</p>
-                )}
-                {ticket.aiProcessedAt && (
-                  <p className="text-xs text-gray-400">
-                    Processed {formatDateTime(ticket.aiProcessedAt)}
-                  </p>
-                )}
+            {!ticket.aiProcessedAt ? (
+              <div className="mt-3 flex items-center gap-2 text-sm text-gray-400">
+                <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-purple-300 border-t-purple-600" />
+                <span>AI analysis pending...</span>
               </div>
             ) : (
-              <p className="mt-3 text-sm italic text-gray-400">
-                AI analysis will appear here after processing — Phase 3.
-              </p>
+              <div className="mt-3 space-y-2 text-sm text-gray-600">
+                {ticket.aiSummary && <p>{ticket.aiSummary}</p>}
+                <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                  {ticket.aiCategory && (
+                    <span className="rounded-full bg-purple-50 px-2 py-0.5 font-medium text-purple-700">
+                      {ticket.aiCategory}
+                    </span>
+                  )}
+                  {ticket.aiPriority && (
+                    <span className="rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-700">
+                      {ticket.aiPriority} priority
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400">
+                  Processed {formatDateTime(ticket.aiProcessedAt)}
+                </p>
+              </div>
             )}
           </div>
         </div>

@@ -12,6 +12,7 @@ import type { UpdateTicketDto } from './dto/update-ticket.dto';
 import type { TicketQueryDto } from './dto/ticket-query.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { LogsService, AuditAction } from '../logs/logs.service';
+import { TicketProducer } from '../ai/producers/ticket.producer';
 
 const VALID_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
   [TicketStatus.OPEN]: [TicketStatus.IN_PROGRESS],
@@ -47,6 +48,7 @@ export class TicketsService {
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
     private readonly logs: LogsService,
+    private readonly aiProducer: TicketProducer,
   ) {}
 
   async create(dto: CreateTicketDto, reporter: AuthUser) {
@@ -84,6 +86,8 @@ export class TicketsService {
         metadata: { assigneeId: ticket.assigneeId },
       });
     }
+
+    void this.aiProducer.enqueueAnalysis(ticket.id, ticket.title, ticket.description);
 
     return ticket;
   }
