@@ -233,18 +233,21 @@
 
 ## Phase 4 — Smart Integrations (🟢 SELECTIVE)
 
-### 4.1 Google Calendar Sync
-- [ ] Google OAuth credentials
-- [ ] Calendar service (create/update events)
-- [ ] Link ticket due date → Calendar event on assignment
-- [ ] `POST /tickets/:id/calendar-sync`
+### 4.1 Google Calendar Sync ✅
+- [x] Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI)
+- [x] Calendar service (create/update events via googleapis v3)
+- [x] Google OAuth2 flow: GET /google/connect → consent screen → GET /google/callback → saves refresh_token
+- [x] Link ticket due date → Calendar event on assignment
+- [x] `POST /google/tickets/:id/calendar-sync`
+- [x] Sync to Calendar button in ticket detail sidebar (shown when dueDate + assigneeId set)
 
-### 4.2 File Attachments
-- [ ] Multer for file upload in NestJS
-- [ ] Local storage (dev) / S3-compatible (prod)
-- [ ] `POST /tickets/:id/attachments`
-- [ ] `GET /tickets/:id/attachments`
-- [ ] Attachment list component in frontend
+### 4.2 File Attachments ✅
+- [x] Multer diskStorage for file upload in NestJS (per-ticket subdirectory)
+- [x] Local storage with useStaticAssets serving /uploads/* via NestExpressApplication
+- [x] `POST /tickets/:id/attachments` (max 10 MB, extension allowlist)
+- [x] `GET /tickets/:id/attachments`
+- [x] `DELETE /attachments/:id`
+- [x] AttachmentPanel component in frontend (upload button, file list, hover-delete, formatBytes)
 
 ### 4.3 Stripe Demo (Optional)
 - [ ] Stripe test mode account
@@ -266,7 +269,7 @@
 
 ### CI/CD
 - [x] GitHub Actions: lint on PR
-- [ ] GitHub Actions: unit tests on PR (no tests written yet)
+- [x] GitHub Actions: unit tests on PR (tickets.service.spec + logs.service.spec — 14 tests)
 - [x] GitHub Actions: build check on PR
 - [x] GitHub Actions: auto-deploy to Vercel on merge to main
 - [x] GitHub Actions: auto-deploy to Render on merge to main
@@ -279,16 +282,22 @@
 - [ ] Optional: Kubernetes manifests for API deployment
 
 ### Observability
-- [ ] Structured logging (Pino / Winston)
+- [x] Structured logging (nestjs-pino — JSON in prod, pino-pretty in dev; redacts Authorization header; skips /health)
 - [ ] Request ID propagation
 - [ ] Error tracking (Sentry integration)
-- [ ] BullMQ job monitoring dashboard
+- [x] BullMQ job monitoring dashboard (Bull Board at `/queues`)
 
 ### Performance
-- [ ] Redis caching layer for hot queries
+- [x] In-memory response caching (`@nestjs/cache-manager` — 30s TTL on GET /tickets and GET /tickets/:id; cleared on mutations)
 - [x] Prisma query optimization (explicit `select` on all queries — no over-fetching)
 - [x] Pagination on all list endpoints (`page` + `limit` with meta on `/tickets`)
 - [ ] Image optimization (Next.js built-in)
+
+### Testing
+- [x] Jest `moduleNameMapper` for tsconfig path aliases (@common/*, @database/*, @modules/*, @config/*, @queue/*)
+- [x] `tickets.service.spec.ts` — 9 unit tests (pagination, findOne 404, create fire-and-forget, RBAC, status transitions, soft-delete)
+- [x] `logs.service.spec.ts` — 4 unit tests (fire-and-forget, error swallowing, pagination, entity filtering)
+- [ ] Integration tests (e2e with Supertest + test DB)
 
 ---
 
@@ -308,10 +317,10 @@
 
 ## Current Focus
 
-**Phase 4 — Smart Integrations**
+**Enterprise Practices — Ongoing hardening**
 
-Complete: Phases 0, 1.1–1.9, 2.1–2.6, 3.1–3.5.  
-**Phases 1, 2, and 3 are fully complete. Next up: Phase 4 — Google Calendar Sync and File Attachments.**
+Complete: Phases 0, 1.1–1.9, 2.1–2.6, 3.1–3.5, 4.1–4.2.  
+**All feature phases are complete. Current work: enterprise observability, caching, and testing.**
 
 > **Manual steps still required before going live:**
 > - Auth0 tenant setup (see `docs/auth0-setup.md`) — fill `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` in `.env.local`
@@ -320,3 +329,4 @@ Complete: Phases 0, 1.1–1.9, 2.1–2.6, 3.1–3.5.
 > - Set `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID` in Render dashboard for Phase 2.4
 > - Set `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL` in Render dashboard for Phase 2.4
 > - Set `HUGGINGFACE_API_KEY` in Render dashboard for Phase 3
+> - Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` in Render dashboard for Phase 4.1

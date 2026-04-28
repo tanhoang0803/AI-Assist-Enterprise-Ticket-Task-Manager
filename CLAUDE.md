@@ -73,6 +73,8 @@ ticket-task_manager/
 | `notifications` | ✅ Live | Slack webhook (chat.postMessage), SendGrid email on assignment |
 | `logs` | ✅ Live | Audit trail (CREATED/UPDATED/STATUS_CHANGED/ASSIGNED/DELETED), `GET /logs` |
 | `ai` | ✅ Live | BullMQ producer/processor, Hugging Face summarization + zero-shot classification, `POST /ai/analyze/:id` |
+| `attachments` | ✅ Live | Multer diskStorage per-ticket upload; static serving `/uploads/*`; `POST/GET/DELETE /tickets/:id/attachments` |
+| `google` | ✅ Live | OAuth2 flow (`GET /google/connect`, `GET /google/callback`); Calendar event sync `POST /google/tickets/:id/calendar-sync` |
 | `workflow` | 🔲 Phase 4+ | Automation rules, triggers |
 
 ---
@@ -98,6 +100,12 @@ ticket-task_manager/
 | DELETE | `/api/tasks/:id` | JWT | Delete task |
 | GET | `/api/logs` | JWT | Paginated audit log (filter by entityType + entityId) |
 | POST | `/api/ai/analyze/:id` | JWT | Manually trigger AI analysis for a ticket |
+| POST | `/api/tickets/:id/attachments` | JWT | Upload file attachment (max 10 MB, multipart/form-data) |
+| GET | `/api/tickets/:id/attachments` | JWT | List attachments for a ticket |
+| DELETE | `/api/attachments/:id` | JWT | Delete an attachment |
+| GET | `/api/google/connect` | JWT | Get Google OAuth2 consent URL |
+| GET | `/api/google/callback` | — | OAuth2 redirect handler (saves refresh_token) |
+| POST | `/api/google/tickets/:id/calendar-sync` | JWT | Sync ticket due date to Google Calendar |
 
 ---
 
@@ -239,7 +247,12 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 3.3 — AI Processor | ✅ Done |
 | Phase 3.4 — AI Module + API | ✅ Done |
 | Phase 3.5 — Frontend AI Features | ✅ Done |
-| Phase 4 — Integrations | 🔲 Next |
+| Phase 4.1 — Google Calendar Sync | ✅ Done |
+| Phase 4.2 — File Attachments | ✅ Done |
+| Enterprise — Structured Logging | ✅ Done (nestjs-pino, JSON prod / pretty dev) |
+| Enterprise — Response Caching | ✅ Done (@nestjs/cache-manager, 30s TTL on GET /tickets) |
+| Enterprise — Unit Tests | ✅ Done (14 tests: TicketsService + LogsService) |
+| Enterprise — CI Test Job | ✅ Done (runs after lint-and-typecheck, before build) |
 
 See `TODO.md` for full task-level breakdown.
 

@@ -26,7 +26,11 @@ A production-like system demonstrating how modern enterprise software is designe
 | **Audit log** | Every ticket + task mutation recorded (`CREATED`, `UPDATED`, `STATUS_CHANGED`, `ASSIGNED`, `DELETED`); activity panel on ticket detail page |
 | **AI analysis** | Auto-triggered on ticket create via BullMQ; Hugging Face summarization + zero-shot category/priority classification; Re-analyze button + live polling in UI |
 | **Authentication** | Auth0 JWT (RS256); auto-upsert user on login; RBAC (ADMIN / MANAGER / MEMBER) |
-| **Deployment** | Vercel (frontend) + Render (backend); GitHub Actions CI: lint → typecheck → build → deploy |
+| **File attachments** | Upload to ticket (jpg/png/pdf/doc/xlsx/zip, max 10 MB); file list with delete; served from `/uploads/` |
+| **Google Calendar sync** | OAuth2 connect flow; sync ticket due date → Calendar event; button visible when assignee + due date set |
+| **Structured logging** | `nestjs-pino` — JSON logs in production, pretty-printed in dev; auth header redacted; /health excluded |
+| **Response caching** | `@nestjs/cache-manager` — GET /tickets and GET /tickets/:id cached 30s; cleared on any mutation |
+| **Deployment** | Vercel (frontend) + Render (backend); GitHub Actions CI: lint → typecheck → unit tests → build → deploy |
 
 ---
 
@@ -186,8 +190,8 @@ ticket-task_manager/
 | Phase 2.5 — Search | ✅ Done | ILIKE search on title+description, debounced UI |
 | Phase 2.6 — Audit Log | ✅ Done | Activity trail, `GET /logs`, ticket detail activity panel |
 | Phase 3 — AI Layer | ✅ Done | BullMQ queue, Hugging Face summarization + classification, live polling UI |
-| Phase 4 — Integrations | 🔲 Next | Google Calendar, File Uploads |
-| Enterprise Practices | 🔄 Ongoing | CI/CD, RBAC, Redis cache, Observability |
+| Phase 4 — Integrations | ✅ Done | Google Calendar sync, File attachments |
+| Enterprise Practices | ✅ Hardened | Structured logging (Pino), in-memory caching, 14 unit tests, CI test job |
 
 See `TODO.md` for detailed task breakdown.
 
