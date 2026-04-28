@@ -195,38 +195,39 @@
 
 ---
 
-## Phase 3 — AI-Assist Layer (🔵 CORE DIFFERENTIATOR)
+## Phase 3 — AI-Assist Layer (🔵 CORE DIFFERENTIATOR) ✅
 
-### 3.1 Queue Infrastructure
-- [ ] Install BullMQ + @nestjs/bull
-- [ ] Configure Redis connection
-- [ ] Queue module setup
-- [ ] Bull Dashboard (monitoring UI)
+### 3.1 Queue Infrastructure ✅
+- [x] Install @nestjs/bullmq + bullmq
+- [x] Configure Redis connection via ConfigService
+- [x] QueueModule (@Global) — registers `ticket-ai` queue
+- [x] Bull Board monitoring UI at `/queues` (@bull-board/nestjs)
 
-### 3.2 Ticket Producer
-- [ ] `ticket.producer.ts` — enqueue job on ticket create
-- [ ] Job payload: ticketId, title, description
-- [ ] Retry strategy (3 attempts, exponential backoff)
+### 3.2 Ticket Producer ✅
+- [x] `ticket.producer.ts` — enqueues job on ticket create
+- [x] Job payload: ticketId, title, description
+- [x] jobId deduplication per ticket, 3 attempts + exponential backoff
 
-### 3.3 AI Processor
-- [ ] `ai.processor.ts` — consume queue jobs
-- [ ] Connect to Hugging Face Inference API
-- [ ] Auto-categorization (zero-shot classification)
-- [ ] Priority scoring (text classification)
-- [ ] Ticket summarization (summarization pipeline)
-- [ ] Write results back to DB via Prisma
-- [ ] Trigger notification after AI completes
+### 3.3 AI Processor ✅
+- [x] `ai.processor.ts` — consumes queue jobs (@Processor + WorkerHost)
+- [x] AiService — Hugging Face Inference API via native fetch
+- [x] Auto-categorization (zero-shot, `facebook/bart-large-mnli`)
+- [x] Priority scoring (zero-shot, same model with priority labels)
+- [x] Ticket summarization (`sshleifer/distilbart-cnn-12-6`)
+- [x] All three calls run in parallel via Promise.allSettled
+- [x] Write results back to DB (aiSummary, aiCategory, aiPriority, aiProcessedAt)
+- [x] Slack notification on AI completion via NotificationsService
 
-### 3.4 AI Module
-- [ ] AI service with provider abstraction (HuggingFace / OpenAI fallback)
-- [ ] `POST /ai/analyze` — manual trigger for dev/testing
-- [ ] AI result stored on Ticket model (aiCategory, aiPriority, aiSummary, aiProcessedAt)
+### 3.4 AI Module ✅
+- [x] AiService gracefully disabled without HUGGINGFACE_API_KEY
+- [x] `POST /ai/analyze/:ticketId` — manual re-trigger endpoint
+- [x] AI result fields on Ticket model (already in schema from Phase 1.4)
 
-### 3.5 Frontend — AI Features
-- [ ] AI summary panel on ticket detail page
-- [ ] AI category/priority badge with "AI suggested" label
-- [ ] Processing indicator while job is in queue
-- [ ] Manual re-analyze button
+### 3.5 Frontend — AI Features ✅
+- [x] AI panel on ticket detail page: spinner while aiProcessedAt is null
+- [x] Category + priority badges with AI-suggested values
+- [x] Auto-polls every 8s until aiProcessedAt is set (refetchInterval)
+- [x] Re-analyze button calls POST /ai/analyze/:ticketId
 
 ---
 
@@ -307,10 +308,10 @@
 
 ## Current Focus
 
-**Phase 3 — AI-Assist Layer**
+**Phase 4 — Smart Integrations**
 
-Complete: Phases 0, 1.1–1.9, 2.1 (Kanban), 2.2 (Tasks), 2.3 (Assignment & Deadlines), 2.4 (Notifications), 2.5 (Search), 2.6 (Audit Log).  
-**Phase 2 is fully complete. Next up: Phase 3 — AI Layer (BullMQ + Redis + Hugging Face).**
+Complete: Phases 0, 1.1–1.9, 2.1–2.6, 3.1–3.5.  
+**Phases 1, 2, and 3 are fully complete. Next up: Phase 4 — Google Calendar Sync and File Attachments.**
 
 > **Manual steps still required before going live:**
 > - Auth0 tenant setup (see `docs/auth0-setup.md`) — fill `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` in `.env.local`

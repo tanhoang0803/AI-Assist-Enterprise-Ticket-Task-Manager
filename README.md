@@ -24,6 +24,7 @@ A production-like system demonstrating how modern enterprise software is designe
 | **Search & filters** | Debounced full-text search on title+description; filter by status, priority, overdue |
 | **Notifications** | Slack `chat.postMessage` on ticket created/assigned/status-changed; SendGrid HTML email on assignment |
 | **Audit log** | Every ticket + task mutation recorded (`CREATED`, `UPDATED`, `STATUS_CHANGED`, `ASSIGNED`, `DELETED`); activity panel on ticket detail page |
+| **AI analysis** | Auto-triggered on ticket create via BullMQ; Hugging Face summarization + zero-shot category/priority classification; Re-analyze button + live polling in UI |
 | **Authentication** | Auth0 JWT (RS256); auto-upsert user on login; RBAC (ADMIN / MANAGER / MEMBER) |
 | **Deployment** | Vercel (frontend) + Render (backend); GitHub Actions CI: lint → typecheck → build → deploy |
 
@@ -36,7 +37,8 @@ A production-like system demonstrating how modern enterprise software is designe
 - **Notifications** — Slack webhooks + SendGrid email on ticket created/assigned/status-changed
 - **Authentication & Authorization** — JWT, Auth0, RBAC guards on all protected endpoints
 - **Audit Logging** — full activity trail (ticket + task mutations); `GET /logs`; activity panel in ticket detail
-- **Async Queue Processing** *(Phase 3)* — BullMQ + Redis decouples heavy AI jobs from request lifecycle
+- **Async Queue Processing** — BullMQ + Redis decouples AI jobs from the request lifecycle; 3-retry exponential backoff; Bull Board monitoring at `/queues`
+- **AI Analysis** — Hugging Face summarization + zero-shot classification auto-triggered on ticket create; manual re-trigger via `POST /ai/analyze/:id`
 
 ---
 
@@ -51,8 +53,7 @@ A production-like system demonstrating how modern enterprise software is designe
 ┌──────────────────────▼──────────────────────────────┐
 │               Backend (NestJS)                       │
 │   Auth │ Users │ Tickets │ Tasks   ← live            │
-│   Notifications │ Logs              ← live            │
-│   AI                                ← planned         │
+│   Notifications │ Logs │ AI        ← live            │
 └──────┬───────────────────────────┬──────────────────┘
        │                           │
 ┌──────▼──────┐           ┌────────▼────────┐
@@ -184,8 +185,8 @@ ticket-task_manager/
 | Phase 2.4 — Notifications | ✅ Done | Slack webhooks + SendGrid email |
 | Phase 2.5 — Search | ✅ Done | ILIKE search on title+description, debounced UI |
 | Phase 2.6 — Audit Log | ✅ Done | Activity trail, `GET /logs`, ticket detail activity panel |
-| Phase 3 — AI Layer | 🔲 Next | BullMQ + Hugging Face auto-processing |
-| Phase 4 — Integrations | 🔲 Planned | Google Calendar, File Uploads |
+| Phase 3 — AI Layer | ✅ Done | BullMQ queue, Hugging Face summarization + classification, live polling UI |
+| Phase 4 — Integrations | 🔲 Next | Google Calendar, File Uploads |
 | Enterprise Practices | 🔄 Ongoing | CI/CD, RBAC, Redis cache, Observability |
 
 See `TODO.md` for detailed task breakdown.

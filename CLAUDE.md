@@ -17,11 +17,12 @@ ticket-task_manager/
 │   ├── web/                    # Next.js 14 · TypeScript · TailwindCSS · App Router
 │   │   ├── app/(protected)/    # Auth-guarded pages: dashboard (Kanban), tickets, tickets/[id]
 │   │   ├── features/tickets/   # Components, hooks (useTickets, useTasks, useKanban, useUsers, useLogs)
-│   │   └── services/           # API wrappers: tickets.ts, tasks.ts, users.ts, logs.ts, api.ts
-│   └── api/                    # NestJS · TypeScript · Prisma (BullMQ — Phase 3)
+│   │   └── services/           # API wrappers: tickets.ts, tasks.ts, users.ts, logs.ts, ai.ts, api.ts
+│   └── api/                    # NestJS · TypeScript · Prisma · BullMQ
 │       ├── prisma/             # schema.prisma, migrations, seed.ts
 │       └── src/
-│           ├── modules/        # auth, users, tickets, tasks, notifications, logs, health
+│           ├── queue/          # QueueModule — BullMQ Redis connection + Bull Board UI
+│           ├── modules/        # auth, users, tickets, tasks, notifications, logs, ai, health
 │           ├── common/         # guards, decorators, interceptors, filters
 │           ├── config/         # configuration.ts, Joi validation schema
 │           └── database/       # PrismaModule, PrismaService
@@ -71,8 +72,8 @@ ticket-task_manager/
 | `health` | ✅ Live | Memory heap + Prisma ping health check |
 | `notifications` | ✅ Live | Slack webhook (chat.postMessage), SendGrid email on assignment |
 | `logs` | ✅ Live | Audit trail (CREATED/UPDATED/STATUS_CHANGED/ASSIGNED/DELETED), `GET /logs` |
-| `ai` | 🔲 Phase 3 | AI analysis orchestration, Hugging Face / OpenAI |
-| `workflow` | 🔲 Phase 3+ | Automation rules, triggers |
+| `ai` | ✅ Live | BullMQ producer/processor, Hugging Face summarization + zero-shot classification, `POST /ai/analyze/:id` |
+| `workflow` | 🔲 Phase 4+ | Automation rules, triggers |
 
 ---
 
@@ -96,6 +97,7 @@ ticket-task_manager/
 | PATCH | `/api/tasks/:id` | JWT | Update task title/status |
 | DELETE | `/api/tasks/:id` | JWT | Delete task |
 | GET | `/api/logs` | JWT | Paginated audit log (filter by entityType + entityId) |
+| POST | `/api/ai/analyze/:id` | JWT | Manually trigger AI analysis for a ticket |
 
 ---
 
@@ -232,8 +234,12 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 2.4 — Notifications | ✅ Done |
 | Phase 2.5 — Search | ✅ Done (ILIKE, implemented in Phase 1.7/1.8) |
 | Phase 2.6 — Audit Log | ✅ Done |
-| Phase 3 — AI Layer | 🔲 Next |
-| Phase 4 — Integrations | 🔲 Planned |
+| Phase 3.1 — Queue Infrastructure | ✅ Done |
+| Phase 3.2 — Ticket Producer | ✅ Done |
+| Phase 3.3 — AI Processor | ✅ Done |
+| Phase 3.4 — AI Module + API | ✅ Done |
+| Phase 3.5 — Frontend AI Features | ✅ Done |
+| Phase 4 — Integrations | 🔲 Next |
 
 See `TODO.md` for full task-level breakdown.
 
