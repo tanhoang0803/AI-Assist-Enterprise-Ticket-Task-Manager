@@ -52,7 +52,7 @@ ticket-task_manager/
 | Backend | NestJS, TypeScript, Prisma ORM |
 | Database | PostgreSQL (Supabase for hosted) |
 | Queue | BullMQ + Redis |
-| Auth | Auth0 (primary) / Firebase Auth (alt) |
+| Auth | next-auth v4 (credentials provider) + bcrypt + HS256 JWT |
 | AI | Hugging Face Inference API / OpenAI (fallback) |
 | Notifications | Slack API, SendGrid |
 | Scheduling | Google Calendar API |
@@ -65,7 +65,7 @@ ticket-task_manager/
 
 | Module | Status | Responsibility |
 |---|---|---|
-| `auth` | ✅ Live | JWT validation, Auth0 integration, RBAC guards |
+| `auth` | ✅ Live | Email/password register + login, bcrypt hashing, HS256 JWT signing, RBAC guards |
 | `users` | ✅ Live | User CRUD, roles, profile, `GET /users/assignable` |
 | `tickets` | ✅ Live | Ticket lifecycle, status transitions, assignment, overdue filters |
 | `tasks` | ✅ Live | Per-ticket task CRUD, checklist |
@@ -84,6 +84,8 @@ ticket-task_manager/
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/health` | — | Health check |
+| POST | `/api/auth/register` | — | Register new account (email + password + name) |
+| POST | `/api/auth/login` | — | Login, returns signed JWT + user |
 | GET | `/api/auth/profile` | JWT | Current user from DB |
 | GET | `/api/users/me` | JWT | Own profile |
 | GET | `/api/users/assignable` | JWT | id+name+avatar list for dropdowns |
@@ -231,7 +233,7 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Phase 1.2 — Next.js App Setup | ✅ Done |
 | Phase 1.3 — NestJS App Setup | ✅ Done |
 | Phase 1.4 — Prisma + PostgreSQL | ✅ Done |
-| Phase 1.5 — Auth0 Integration | ✅ Done (manual Auth0 tenant still needed) |
+| Phase 1.5 — Auth (credentials) | ✅ Done (next-auth + bcrypt; no external provider) |
 | Phase 1.6 — Users Module | ✅ Done |
 | Phase 1.7 — Tickets Module | ✅ Done |
 | Phase 1.8 — Frontend Ticket UI | ✅ Done |
@@ -253,6 +255,7 @@ See `.claude/skills/ai-integration.md` for queue job structure and AI provider p
 | Enterprise — Response Caching | ✅ Done (@nestjs/cache-manager, 30s TTL on GET /tickets) |
 | Enterprise — Unit Tests | ✅ Done (14 tests: TicketsService + LogsService) |
 | Enterprise — CI Test Job | ✅ Done (runs after lint-and-typecheck, before build) |
+| Auth Migration — next-auth | ✅ Done (replaced Auth0; email/password; register + login pages) |
 
 See `TODO.md` for full task-level breakdown.
 

@@ -78,22 +78,26 @@
 - [x] Seed script — 3 users, 5 tickets (all categories/statuses), 9 tasks, 7 audit logs
 - [x] Run migration: `pnpm docker:up` then `pnpm db:migrate` (requires DATABASE_URL in .env.local)
 
-### 1.5 Auth — Auth0 Integration ✅
-- [ ] Create Auth0 tenant + application (manual — see docs/auth0-setup.md)
-- [ ] Fill in AUTH0_* values in .env.local (manual)
-- [x] Backend: AuthModule (auth.module.ts) with PassportModule
-- [x] Backend: JwtStrategy — RS256 validation via jwks-rsa + Auth0 JWKS endpoint
-- [x] Backend: AuthService.validateAndSyncUser() — auto-upserts user on every login
-- [x] Backend: GET /api/auth/profile — returns DB user profile
-- [x] Backend: RBAC — JwtAuthGuard + RolesGuard already wired (Phase 1.3), role from DB
-- [x] Frontend: @auth0/nextjs-auth0 SDK installed (Phase 1.2)
-- [x] Frontend: Login/logout — /api/auth/login, /api/auth/logout, Sidebar sign-out link
-- [x] Frontend: middleware.ts — withMiddlewareAuthRequired() blocks /dashboard, /tickets, /settings
-- [x] Frontend: GET /api/auth/token route — serves access token to client components
-- [x] Frontend: services/api.ts — request interceptor injects Bearer token automatically
-- [x] Frontend: features/auth/hooks/useAuth.ts — useUser() wrapper with typed helpers
-- [x] Frontend: features/auth/hooks/useAccessToken.ts — React Query hook for access token
-- [x] Docs: docs/auth0-setup.md — step-by-step Auth0 tenant + API setup guide
+### 1.5 Auth — Credentials (email/password) ✅
+- [x] Backend: AuthModule with PassportModule + JwtModule (HS256, JWT_SECRET)
+- [x] Backend: `POST /api/auth/register` — bcrypt hash (cost 10), creates MEMBER user
+- [x] Backend: `POST /api/auth/login` — bcrypt compare, returns signed HS256 JWT
+- [x] Backend: JwtStrategy — HS256 + JWT_SECRET (replaced RS256/JWKS)
+- [x] Backend: AuthService.validateAndSyncUser() — looks up user by id from JWT sub
+- [x] Backend: `GET /api/auth/profile` — returns DB user profile (JWT-protected)
+- [x] Backend: RBAC — JwtAuthGuard + RolesGuard, role from DB only
+- [x] Backend: User.password field added to Prisma schema (nullable String)
+- [x] Frontend: next-auth v4 credentials provider (replaced @auth0/nextjs-auth0)
+- [x] Frontend: lib/auth.ts — authOptions shared by route handler + server helpers
+- [x] Frontend: app/api/auth/[...nextauth]/route.ts — next-auth GET/POST handler
+- [x] Frontend: /auth/login page — email/password form, error feedback
+- [x] Frontend: /auth/register page — name/email/password, auto-signs-in on success
+- [x] Frontend: middleware.ts — next-auth/middleware (replaces withMiddlewareAuthRequired)
+- [x] Frontend: GET /api/auth/token route — uses getServerSession to return accessToken
+- [x] Frontend: SessionProvider wrapper client component in components/providers/
+- [x] Frontend: useAuth/useAccessToken hooks use useSession from next-auth/react
+- [x] Frontend: types/next-auth.d.ts — Session extended with accessToken, role, id
+- [x] .env.local: NEXTAUTH_URL + NEXTAUTH_SECRET; AUTH0_* vars commented out
 
 ### 1.6 Users Module (Backend) ✅
 - [x] `GET /users` — list users (ADMIN only)
@@ -317,16 +321,19 @@
 
 ## Current Focus
 
-**Enterprise Practices — Ongoing hardening**
+**Project complete — all phases shipped**
 
-Complete: Phases 0, 1.1–1.9, 2.1–2.6, 3.1–3.5, 4.1–4.2.  
-**All feature phases are complete. Current work: enterprise observability, caching, and testing.**
+Complete: Phases 0, 1.1–1.9, 2.1–2.6, 3.1–3.5, 4.1–4.2, enterprise hardening, auth migration.
 
-> **Manual steps still required before going live:**
-> - Auth0 tenant setup (see `docs/auth0-setup.md`) — fill `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` in `.env.local`
-> - Set `RENDER_DEPLOY_HOOK_URL` in GitHub repo secrets
-> - Set `DATABASE_URL`, `DIRECT_URL`, `AUTH0_*` in Render dashboard env vars
-> - Set `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID` in Render dashboard for Phase 2.4
-> - Set `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL` in Render dashboard for Phase 2.4
-> - Set `HUGGINGFACE_API_KEY` in Render dashboard for Phase 3
-> - Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` in Render dashboard for Phase 4.1
+> **Steps required to run locally:**
+> - Run `ALTER TABLE users ADD COLUMN IF NOT EXISTS password TEXT;` in Supabase SQL Editor (one-time migration)
+> - Fill `JWT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL` in `.env.local`
+> - `pnpm docker:up` → `pnpm dev` → register at `http://localhost:3000/auth/register`
+> - Promote first user to ADMIN: `UPDATE users SET role = 'ADMIN' WHERE email = 'your@email.com';`
+>
+> **Optional integrations (set in `.env.local` / Render dashboard):**
+> - `SLACK_BOT_TOKEN` + `SLACK_CHANNEL_ID` — Slack notifications
+> - `SENDGRID_API_KEY` + `SENDGRID_FROM_EMAIL` — email on assignment
+> - `HUGGINGFACE_API_KEY` — AI analysis
+> - `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` + `GOOGLE_REDIRECT_URI` — Calendar sync
+> - `RENDER_DEPLOY_HOOK_URL` — GitHub Actions auto-deploy to Render
