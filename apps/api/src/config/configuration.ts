@@ -6,6 +6,9 @@ export const configValidationSchema = Joi.object({
 
   DATABASE_URL: Joi.string().required(),
 
+  JWT_SECRET: Joi.string().default('dev-secret-change-in-production-must-be-long'),
+  JWT_EXPIRES_IN: Joi.string().default('7d'),
+
   REDIS_HOST: Joi.string().default('localhost'),
   REDIS_PORT: Joi.number().default(6379),
   REDIS_PASSWORD: Joi.string().allow('').optional(),
@@ -32,6 +35,8 @@ export interface AppConfig {
   nodeEnv: string;
   database: { url: string };
   redis: { host: string; port: number; password?: string };
+  jwtSecret: string;
+  jwtExpiresIn: string;
   auth0: { domain: string; audience: string };
   huggingface: { apiKey?: string };
   openai: { apiKey?: string };
@@ -44,6 +49,8 @@ export default (): AppConfig => ({
   port: parseInt(process.env.PORT ?? '4000', 10),
   nodeEnv: process.env.NODE_ENV ?? 'development',
   database: { url: process.env.DATABASE_URL ?? '' },
+  jwtSecret: process.env.JWT_SECRET ?? 'dev-secret-change-in-production-must-be-long',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   redis: {
     host: process.env.REDIS_HOST ?? 'localhost',
     port: parseInt(process.env.REDIS_PORT ?? '6379', 10),

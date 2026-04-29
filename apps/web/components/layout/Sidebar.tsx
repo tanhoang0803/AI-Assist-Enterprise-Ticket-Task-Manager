@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import { LayoutDashboard, Ticket, Settings, LogOut } from 'lucide-react';
 import { cn } from '@repo/utils';
 
@@ -40,13 +41,13 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-gray-200 p-3">
-        <a
-          href="/api/auth/logout"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+        <button
+          onClick={() => void signOut({ callbackUrl: '/auth/login' })}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
           <LogOut className="h-4 w-4" />
           Sign out
-        </a>
+        </button>
       </div>
     </aside>
   );

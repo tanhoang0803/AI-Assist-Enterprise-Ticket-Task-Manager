@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { SessionProvider } from '@/components/providers/SessionProvider';
 import { QueryProviders } from '@/components/providers/QueryProviders';
 import '@/styles/globals.css';
 
@@ -18,9 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable}>
       <body>
-        <UserProvider>
+        <SessionProvider>
           <QueryProviders>{children}</QueryProviders>
-        </UserProvider>
+        </SessionProvider>
       </body>
     </html>
   );

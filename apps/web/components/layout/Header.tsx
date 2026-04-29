@@ -1,11 +1,10 @@
 'use client';
 
-import type { Claims } from '@auth0/nextjs-auth0';
 import { Bell } from 'lucide-react';
 import { initials } from '@repo/utils';
 
 interface Props {
-  user: Claims;
+  user: { name?: string | null; email?: string | null; image?: string | null };
 }
 
 export function Header({ user }: Props) {
@@ -22,21 +21,21 @@ export function Header({ user }: Props) {
         </button>
 
         <div className="flex items-center gap-3">
-          {user.picture ? (
+          {user.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={user.picture as string}
-              alt={user.name as string}
+              src={user.image}
+              alt={user.name ?? 'User'}
               className="h-8 w-8 rounded-full object-cover"
             />
           ) : (
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
-              {initials((user.name as string) ?? 'U')}
+              {initials(user.name ?? 'U')}
             </div>
           )}
           <div className="hidden sm:block">
-            <p className="text-sm font-medium text-gray-900">{user.name as string}</p>
-            <p className="text-xs text-gray-500">{user.email as string}</p>
+            <p className="text-sm font-medium text-gray-900">{user.name}</p>
+            <p className="text-xs text-gray-500">{user.email}</p>
           </div>
         </div>
       </div>

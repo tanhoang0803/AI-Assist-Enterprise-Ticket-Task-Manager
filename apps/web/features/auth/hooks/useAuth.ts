@@ -1,16 +1,14 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useSession } from 'next-auth/react';
 
 export function useAuth() {
-  const { user, error, isLoading } = useUser();
+  const { data: session, status } = useSession();
 
   return {
-    user,
-    isLoading,
-    isAuthenticated: !!user && !error,
-    error,
-    loginUrl: '/api/auth/login',
-    logoutUrl: '/api/auth/logout',
+    user: session?.user ?? null,
+    isLoading: status === 'loading',
+    isAuthenticated: status === 'authenticated',
+    error: null,
   };
 }

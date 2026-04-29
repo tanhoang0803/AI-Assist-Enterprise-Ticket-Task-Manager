@@ -1,11 +1,12 @@
-import { getSession } from '@auth0/nextjs-auth0';
+import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
-  if (!session?.user) redirect('/auth/login');
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/auth/login');
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">

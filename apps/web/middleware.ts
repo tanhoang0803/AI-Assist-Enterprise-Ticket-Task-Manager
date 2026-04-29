@@ -1,11 +1,5 @@
-import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
-
-export default withMiddlewareAuthRequired();
+export { default } from 'next-auth/middleware';
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/tickets/:path*',
-    '/settings/:path*',
-  ],
+  matcher: ['/dashboard/:path*', '/tickets/:path*', '/settings/:path*'],
 };
